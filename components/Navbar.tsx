@@ -1,17 +1,19 @@
+"use client";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { User } from "lucide-react";
+import { useState, useRef } from "react";
 
 const navLinks = [
   { href: "/home", label: "Home" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/FAQ", label: "FAQ" },
-  { href: "/my-account", label: "My Account" },
 ];
 
 export default function Navbar() {
   return (
     <motion.nav
-      className="w-full flex items-center justify-between px-8 py-4 bg-sidebar border-b border-sidebar-border shadow-sm"
+      className="w-full fixed top-0 left-0 z-30 flex items-center justify-between px-8 py-4 bg-sidebar/90 backdrop-blur border-b border-sidebar-border shadow-sm"
       initial={false}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -24,7 +26,7 @@ export default function Navbar() {
       >
         MedEase
       </motion.span>
-      <div className="flex gap-6 text-base font-medium">
+      <div className="flex gap-6 text-base font-medium items-center">
         {navLinks.map((link, i) => (
           <motion.div
             key={link.href}
@@ -50,6 +52,14 @@ export default function Navbar() {
             </Link>
           </motion.div>
         ))}
+        {/* My Account direct link */}
+        <Link
+          href="/my-account/login"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-primary/10 transition-colors focus:outline-none"
+        >
+          <User className="w-5 h-5 text-primary" />
+          <span>My Account</span>
+        </Link>
       </div>
     </motion.nav>
   );

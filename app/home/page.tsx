@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -16,7 +16,7 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
       <Navbar />
       {/* Hero Section */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-16 bg-background w-full">
+      <main className="flex flex-1 flex-col items-center justify-center px-4 mt-18 py-16 bg-background w-full">
         <div className="flex flex-col md:flex-row items-center md:items-stretch gap-10 w-full max-w-6xl mx-auto">
           {/* Hero Texts */}
           <motion.div
