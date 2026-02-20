@@ -77,7 +77,7 @@ export default function Home() {
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <Image
-              src="/hero-healthcare.svg"
+              src="https://res.cloudinary.com/dcgmi6w24/image/upload/v1771571672/ChatGPT_Image_Feb_20_2026_09_10_38_AM_nbmzo0.png"
               alt="Doctors, pharmacist, and patient interacting with the system"
               width={850}
               height={600}
