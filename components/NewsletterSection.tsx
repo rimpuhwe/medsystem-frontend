@@ -2,11 +2,11 @@ import { Mail } from "lucide-react";
 
 export default function NewsletterSection() {
   return (
-    <section className="w-full py-16 flex flex-col items-center bg-muted/50">
+    <section className="w-full py-24 flex flex-col items-center">
       <div className="max-w-xl w-full flex flex-col items-center text-center">
         <div className="flex items-center justify-center mb-3 text-primary">
-          <Mail className="w-7 h-7 mr-2" />
-          <span className="font-semibold text-lg">Join our Newsletter</span>
+          <Mail className="w-8 h-8 mr-2" />
+          <span className="font-semibold text-3xl md:text-4xl">Join our Newsletter</span>
         </div>
         <p className="mb-6 text-muted-foreground text-sm md:text-base">
           Stay up to date with the latest updates, health tips, and platform
@@ -22,7 +22,7 @@ export default function NewsletterSection() {
           />
           <button
             type="submit"
-            className="px-5 py-2 rounded-r-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition"
+            className="px-5 py-2 rounded-r-lg bg-blue-400 text-primary-foreground font-semibold hover:bg-blue-700/90 transition"
           >
             Subscribe
           </button>
