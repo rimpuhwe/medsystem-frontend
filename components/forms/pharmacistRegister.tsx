@@ -33,7 +33,7 @@ export default function PharmacistRegisterForm({
             name="fullName"
             value={formData.fullName ?? ""}
             onChange={onChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 border border-gray-300 hover:border-green-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
             placeholder="Enter your full name"
             required
           />
@@ -51,7 +51,7 @@ export default function PharmacistRegisterForm({
             name="email"
             value={formData.email ?? ""}
             onChange={onChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 border border-gray-300 hover:border-green-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
             placeholder="Enter your email address"
             autoComplete="off"
             required
@@ -69,7 +69,7 @@ export default function PharmacistRegisterForm({
             name="gender"
             value={formData.gender ?? ""}
             onChange={onChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 border border-gray-300 hover:border-green-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
             required
           >
             <option value="">Select gender</option>
@@ -91,7 +91,7 @@ export default function PharmacistRegisterForm({
             name="phone"
             value={formData.phone ?? ""}
             onChange={onChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 border border-gray-300 hover:border-green-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
             placeholder="Enter your phone number"
             required
           />
@@ -115,7 +115,7 @@ export default function PharmacistRegisterForm({
             name="pharmacyName"
             value={formData.pharmacyName ?? ""}
             onChange={onChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 border border-gray-300 hover:border-green-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
             placeholder="Enter pharmacy name"
             required
           />
@@ -133,7 +133,7 @@ export default function PharmacistRegisterForm({
             name="licenseNumber"
             value={formData.licenseNumber ?? ""}
             onChange={onChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+            className="w-full px-4 py-3 border border-gray-300 hover:border-green-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
             placeholder="Enter license number"
             required
           />
@@ -158,7 +158,7 @@ export default function PharmacistRegisterForm({
               name="password"
               value={formData.password ?? ""}
               onChange={onChange}
-              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 pr-12 border border-gray-300 hover:border-green-400 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
               placeholder="Create a secure password"
               autoComplete="off"
               required

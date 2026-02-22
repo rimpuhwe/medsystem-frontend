@@ -34,7 +34,7 @@ export default function PatientRegisterForm({
                 name="beneficiaryName"
                 value={formData.beneficiaryName ?? ""}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 placeholder="Enter beneficiary name"
                 required
               />
@@ -52,7 +52,7 @@ export default function PatientRegisterForm({
                 name="email"
                 value={formData.email ?? ""}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 placeholder="Enter your email address"
                 autoComplete="off"
                 required
@@ -71,7 +71,7 @@ export default function PatientRegisterForm({
                 name="phone"
                 value={formData.phone ?? ""}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 placeholder="Enter your phone number"
                 required
               />
@@ -88,7 +88,7 @@ export default function PatientRegisterForm({
                 name="gender"
                 value={formData.gender ?? ""}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 required
               >
                 <option value="">Select gender</option>
@@ -110,7 +110,7 @@ export default function PatientRegisterForm({
                 name="dob"
                 value={formData.dob ?? ""}
                 onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                 placeholder="YYYY-MM-DD"
                 required
               />
@@ -136,7 +136,7 @@ export default function PatientRegisterForm({
               name="insuranceProvider"
               value={formData.insuranceProvider ?? ""}
               onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Enter insurance provider"
               required
             />
@@ -154,7 +154,7 @@ export default function PatientRegisterForm({
               name="insuranceNumber"
               value={formData.insuranceNumber ?? ""}
               onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Enter insurance number"
               required
             />
@@ -172,7 +172,7 @@ export default function PatientRegisterForm({
               name="insuranceHolder"
               value={formData.insuranceHolder ?? ""}
               onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Enter insurance holder name"
               required
             />
@@ -190,7 +190,7 @@ export default function PatientRegisterForm({
               name="holderEmployer"
               value={formData.holderEmployer ?? ""}
               onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Enter employer name"
               required
             />
@@ -216,7 +216,7 @@ export default function PatientRegisterForm({
               name="password"
               value={formData.password ?? ""}
               onChange={onChange}
-              className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 pr-12 border border-gray-300 hover:border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
               placeholder="Create a secure password"
               autoComplete="off"
               required

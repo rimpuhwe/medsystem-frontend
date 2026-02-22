@@ -12,7 +12,16 @@ export default function LoginScreen() {
   const [registerRole, setRegisterRole] = useState<string | null>(null);
   const [registerStep, setRegisterStep] = useState(1);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const roleColor =
+    registerRole === "patient"
+      ? "bg-blue-500 hover:bg-blue-600"
+      : registerRole === "pharmacist"
+        ? "bg-green-500 hover:bg-green-600"
+        : "bg-gray-500 hover:bg-red-600";
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -38,15 +47,30 @@ export default function LoginScreen() {
     setRegisterRole(null);
     setRegisterStep(1);
   };
-  
+
   const handleNextStep = () => setRegisterStep((s: number) => s + 1);
   const handlePrevStep = () => setRegisterStep((s: number) => s - 1);
 
   return (
     <div className="w-full min-h-screen flex">
       {/* Left side - Hero section */}
-      <div className="flex-1 bg-gradient-to-br from-slate-900 via-blue-900 to-orange-600 flex items-center justify-center p-12">
-        <div className="text-white max-w-lg">
+      <div className="flex-1 relative flex items-center justify-center p-12 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url(" +
+              "https://res.cloudinary.com/dcgmi6w24/image/upload/v1771571672/ChatGPT_Image_Feb_20_2026_09_10_38_AM_nbmzo0.png" +
+              ")",
+          }}
+        />
+
+        {/* Black Transparent Overlay */}
+        <div className="absolute inset-0 bg-black/80" />
+
+        {/* Content */}
+        <div className="relative text-white max-w-lg z-10">
           <h1 className="text-6xl font-bold mb-8 leading-tight">
             Secure access to your healthcare dashboard.
           </h1>
@@ -159,8 +183,8 @@ export default function LoginScreen() {
                     </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center">
+                <div className="flex flex-col">
+                  <label className="flex items-center mb-8">
                     <input
                       type="checkbox"
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
@@ -171,7 +195,7 @@ export default function LoginScreen() {
                   </label>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600"
+                    className="px-4 py-2 rounded font-semibold text-white bg-blue-400 hover:bg-blue-600"
                   >
                     Login
                   </button>
@@ -191,7 +215,7 @@ export default function LoginScreen() {
               <React.Fragment>
                 {/* Register role selection */}
                 {!registerRole && (
-                  <div className="flex flex-col space-y-4">
+                  <div className="flex justify-center gap-4 mb-6">
                     <button
                       type="button"
                       className="px-4 py-2 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600"
@@ -241,7 +265,7 @@ export default function LoginScreen() {
                     )}
                     <button
                       type="button"
-                      className="px-4 py-2 rounded font-semibold text-white bg-blue-500 hover:bg-blue-600"
+                      className={`px-4 py-2 rounded font-semibold text-white ${roleColor}`}
                       onClick={handleNextStep}
                     >
                       Next
@@ -251,26 +275,11 @@ export default function LoginScreen() {
                 {registerStep === 3 && (
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded font-semibold text-white bg-orange-500 hover:bg-orange-600"
+                    className={`px-4 py-2 rounded font-semibold text-white ${roleColor} my-6 `}
                   >
                     Register new account
                   </button>
                 )}
-                <div className="text-center mt-4">
-                  <span className="text-gray-600">
-                    Register as a different role?
-                  </span>{" "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRegisterRole(null);
-                      setRegisterStep(1);
-                    }}
-                    className="text-blue-600 hover:text-blue-700 font-semibold"
-                  >
-                    Choose role
-                  </button>
-                </div>
                 <div className="text-center">
                   <span className="text-gray-600">Already have account?</span>{" "}
                   <button
