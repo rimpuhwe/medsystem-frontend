@@ -17,7 +17,7 @@ export default function DoctorDashboardLayout({
       <Sidebar dashboardType="doctor" />
       
       <div className="flex-1 overflow-auto lg:ml-0">
-        <Header />
+        <Header dashboardType="doctor" />
         <main className="p-4 lg:p-8">
           {children}
         </main>
