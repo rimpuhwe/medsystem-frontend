@@ -9,14 +9,14 @@ import Button from "@/components/Button";
 import FeatureCard from "@/components/FeatureCard";
 import NewsletterSection from "@/components/NewsletterSection";
 import Footer from "@/components/Footer";
-import { Stethoscope, FileText, ShieldCheck, Users, Clock } from "lucide-react";
+import { Stethoscope, FileText, ShieldCheck, Users, Clock, Shield } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
       <Navbar />
       {/* Hero Section */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 mt-18 py-16 bg-background w-full">
+      <main className="flex flex-1 flex-col items-center justify-center px-4 mt-18 py-16  bg-background w-full">
         <div className="flex flex-col md:flex-row items-center md:items-stretch gap-10 w-full max-w-6xl mx-auto">
           {/* Hero Texts */}
           <motion.div
@@ -25,13 +25,14 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            <span className="uppercase tracking-widest text-xs font-semibold text-primary mb-2">
-              Republic of Rwanda - Ministry of Health
-            </span>
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-2 text-primary leading-tight">
+            <div className="flex items-center gap-2 text-blue-600 mb-4">
+                <Shield className="w-5 h-5" />
+                <span className="text-sm ">Republic of Rwanda - Ministry of Health</span>
+              </div>
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in-up">
               Digital Medical
               <br />
-              Ordinance System
+              <span className="text-blue-600">Ordinance System</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-lg">
               Experience Rwanda's secure, efficient, and connected healthcare
@@ -88,7 +89,7 @@ export default function Home() {
         </div>
       </main>
       {/* Features Section */}
-      <section className="w-full py-20 bg-background flex flex-col items-center">
+      <section className="w-full py-20 bg-muted/50 to-white flex flex-col items-center">
         <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4 text-center">
           Platform Features
         </h2>
@@ -97,7 +98,7 @@ export default function Home() {
           System secure, efficient, and easy to use for all healthcare
           stakeholders in Rwanda.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-6xl">
+        <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-6xl">
           <FeatureCard
             icon={<Stethoscope className="w-8 h-8" />}
             title="Doctor & Patient Management"
