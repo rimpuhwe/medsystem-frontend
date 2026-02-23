@@ -87,7 +87,7 @@ export default function PharmacistDashboard() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <button
-            onClick={() => router.push("/pharmacist/dispense")}
+            onClick={() => router.push("/pharmacist/dispensing")}
             className="bg-emerald-600 text-white p-4 rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-700 transition shadow-sm"
           >
             <Pill className="w-5 h-5" /> Dispense
@@ -101,7 +101,7 @@ export default function PharmacistDashboard() {
           </button>
 
           <button
-            onClick={() => router.push("/pharmacist/inventory-stock")}
+            onClick={() => router.push("/pharmacist/Inventory")}
             className="bg-gray-50 border border-gray-200 p-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-100 transition"
           >
             <Package className="w-5 h-5 text-emerald-600" /> Inventory
