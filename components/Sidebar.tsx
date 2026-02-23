@@ -108,8 +108,14 @@ export default function Sidebar({ dashboardType }: SidebarProps) {
       {
         id: "report",
         icon: FileText,
-        label: "Reports",
+        label: "Dispensed Record",
         path: "/pharmacist/report",
+      },
+      {
+        id: "settings",
+        icon: Settings,
+        label: "Settings",
+        path: "/pharmacist/settings",
       },
     ],
   };

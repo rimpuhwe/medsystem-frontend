@@ -11,6 +11,7 @@ export default function LoginScreen() {
   }>({});
   const [registerRole, setRegisterRole] = useState<string | null>(null);
   const [registerStep, setRegisterStep] = useState(1);
+  const [registerLoading, setRegisterLoading] = useState(false);
 
   const roleColor =
     registerRole === "patient"
@@ -28,12 +29,103 @@ export default function LoginScreen() {
     });
   };
 
-  const handleSubmit = (
+  const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Handle login/signup/register logic here
+    // Login
+    if (isLogin) {
+      try {
+        const response = await fetch(
+          "https://medsystemapplication.onrender.com/api/auth/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: formData.email,
+              password: formData.password,
+            }),
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data.message || "Login failed.");
+          return;
+        }
+        alert("Login successful!");
+      } catch (err) {
+        if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+          alert("Network or CORS error. Please check your connection and backend CORS settings.");
+        } else {
+          alert("Network error. Please try again.");
+        }
+      }
+      return;
+    }
+    // Registration
+    if (registerRole === "patient" && registerStep === 3) {
+      setRegisterLoading(true);
+      try {
+        const response = await fetch(
+          "https://medsystemapplication.onrender.com/api/auth/register/patient",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data.message || "Patient registration failed.");
+          setRegisterLoading(false);
+          return;
+        }
+        alert("Patient registered successfully!");
+      } catch (err) {
+        if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+          alert("Network or CORS error. Please check your connection and backend CORS settings.");
+        } else {
+          alert("Network error. Please try again.");
+        }
+      }
+      setRegisterLoading(false);
+      return;
+    }
+    if (registerRole === "pharmacist" && registerStep === 3) {
+      setRegisterLoading(true);
+      try {
+        const response = await fetch(
+          "https://medsystemapplication.onrender.com/api/auth/register/pharmacy",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          },
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          alert(data.message || "Pharmacist registration failed.");
+          setRegisterLoading(false);
+          return;
+        }
+        alert("Pharmacist registered successfully!");
+      } catch (err) {
+        if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
+          alert("Network or CORS error. Please check your connection and backend CORS settings.");
+        } else {
+          alert("Network error. Please try again.");
+        }
+      }
+      setRegisterLoading(false);
+      return;
+    }
+    // Otherwise, do nothing
   };
 
   const togglePasswordVisibility = () => {
@@ -272,12 +364,38 @@ export default function LoginScreen() {
                     </button>
                   </div>
                 )}
-                {registerStep === 3 && (
+                {registerStep === 3 && registerRole && (
                   <button
                     type="submit"
-                    className={`px-4 py-2 rounded font-semibold text-white ${roleColor} my-6 `}
+                    className={`px-4 py-2 rounded font-semibold text-white ${roleColor} my-6 flex items-center justify-center`}
+                    onClick={handleSubmit}
+                    disabled={registerLoading}
                   >
-                    Register new account
+                    {registerLoading && (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        ></path>
+                      </svg>
+                    )}
+                    {registerLoading
+                      ? "Registering..."
+                      : "Register new account"}
                   </button>
                 )}
                 <div className="text-center">

@@ -7,6 +7,7 @@ interface ButtonProps {
   href?: string;
   className?: string;
   variant?: "primary" | "outline";
+  onClick?: () => void;
 }
 
 export default function Button({
@@ -14,6 +15,7 @@ export default function Button({
   href,
   className = "",
   variant = "primary",
+  onClick,
 }: ButtonProps) {
   const base =
     variant === "primary"

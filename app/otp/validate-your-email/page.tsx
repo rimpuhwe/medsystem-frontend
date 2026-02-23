@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 
@@ -18,15 +18,34 @@ export default function OtpValidationPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.some((digit) => digit === "")) {
       setError("Please enter all 6 digits.");
       return;
     }
     setError("");
-    // TODO: Validate OTP with backend
-    alert("OTP submitted: " + otp.join(""));
+    try {
+      const response = await fetch(
+        "https://medsystemapplication.onrender.com/api/auth/verify-otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ otp: otp.join("") }),
+        },
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.message || "OTP verification failed.");
+        return;
+      }
+      // Success: handle as needed (redirect, show message, etc.)
+      alert("OTP verified successfully!");
+    } catch (err) {
+      setError("Network error. Please try again.");
+    }
   };
 
   return (
