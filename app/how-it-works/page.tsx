@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import RoleNav from "@/components/RoleNav";
+import AnimatedBackground from "@/components/ui/animated-background";
 import {
   User,
   Stethoscope,
@@ -12,10 +13,47 @@ import {
   ClipboardList,
   CheckCircle,
 } from "lucide-react";
-import AnimatedBackground from "@/components/ui/animated-background";
-import Image from "next/image";
 
-const roleSteps = {
+// ------------------- Types -------------------
+type Role = "patient" | "doctor" | "pharmacist";
+
+type Step = {
+  number: number;
+  title: string;
+  description: React.ReactNode;
+  icon: React.ReactNode;
+};
+
+// ------------------- RoleNav Component -------------------
+type RoleNavProps = {
+  selected: Role;
+  onSelect: (role: Role) => void;
+};
+
+const RoleNav = ({ selected, onSelect }: RoleNavProps) => {
+  const roles: Role[] = ["patient", "doctor", "pharmacist"];
+
+  return (
+    <div className="flex justify-center gap-4 my-4">
+      {roles.map((role) => (
+        <button
+          key={role}
+          onClick={() => onSelect(role)}
+          className={`px-4 py-2 rounded font-medium transition ${
+            selected === role
+              ? "bg-primary text-white shadow-lg"
+              : "bg-gray-200 dark:bg-gray-700 text-black dark:text-white"
+          }`}
+        >
+          {role.charAt(0).toUpperCase() + role.slice(1)}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+// ------------------- Steps Data -------------------
+const roleSteps: Record<Role, Step[]> = {
   patient: [
     {
       number: 1,
@@ -127,9 +165,7 @@ const roleSteps = {
       title: "Register & Verify",
       description: (
         <>
-          <span className="block mb-1">
-            To register as a pharmacy, you need:
-          </span>
+          <span className="block mb-1">To register as a pharmacy, you need:</span>
           <ul className="list-disc list-inside text-sm pl-2">
             <li>Pharmacy Name</li>
             <li>Pharmacy License Number</li>
@@ -175,14 +211,17 @@ const roleSteps = {
   ],
 };
 
-export default function HowItWorksV2() {
-  const [role, setRole] = useState("patient");
+// ------------------- Main Page -------------------
+export default function HowItWorksPage() {
+  const [role, setRole] = useState<Role>("patient");
   const steps = roleSteps[role];
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
       <Navbar />
-      {/* Hero Section with background image and overlay */}
-      <div className="relative w-full h-[340px] md:h-[420px] mt-15 flex items-center justify-center mb-8">
+
+      {/* Hero Section */}
+      <div className="relative w-full h-[340px] md:h-[420px] flex items-center justify-center mb-8">
         <Image
           src="https://res.cloudinary.com/dcgmi6w24/image/upload/v1771838200/Healthcare_Facility_Enhances_Data_Security_with_MDM_clfckr.jpg"
           alt="How it works hero"
@@ -200,23 +239,22 @@ export default function HowItWorksV2() {
           </p>
         </div>
       </div>
-      {/* Small role navbar */}
-      <RoleNav selected={role} onSelect={setRole} />
-      {/* Steps for selected role */}
+
+      {/* Role Selector */}
+      <RoleNav selected={role} onSelect={(r: Role) => setRole(r)} />
+
+      {/* Steps */}
       <main className="flex-1 w-full flex flex-col items-center px-4 pb-16 bg-background">
-        <section className="relative w-full max-w-4xl mx-auto flex flex-col items-center">
-          <AnimatedBackground
-            className="rounded-xl bg-primary/5 dark:bg-primary/10 transition-all duration-300"
-            transition={{ type: 'spring', bounce: 0.25, duration: 0.7 }}
-            enableHover
-          >
-            {steps.map((step, idx) => (
-              <div
-                key={step.number}
-                data-id={`step-${idx}`}
-                className="relative flex flex-col md:flex-row items-center md:items-stretch gap-8 md:gap-0 px-6 py-10 md:py-16 min-h-[200px] md:min-h-[240px]"
-              >
-                {/* Floating number and icon */}
+        <section className="relative w-full max-w-4xl mx-auto flex flex-col items-center gap-8">
+          {steps.map((step) => (
+            <AnimatedBackground
+              key={step.number}
+              className="rounded-xl bg-primary/5 dark:bg-primary/10 w-full transition-all duration-300"
+              transition={{ type: "spring", bounce: 0.25, duration: 0.7 }}
+              enableHover
+            >
+              <div className="relative flex flex-col md:flex-row items-center md:items-stretch gap-8 md:gap-0 px-6 py-10 md:py-16 min-h-[200px] md:min-h-[240px]">
+                {/* Number & Icon */}
                 <div className="flex flex-col items-center md:items-end md:w-1/2 md:pr-12">
                   <div className="relative mb-4 md:mb-0">
                     <span className="flex items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white text-5xl md:text-6xl font-extrabold shadow-2xl border-8 border-background animate-pulse-slow">
@@ -227,7 +265,8 @@ export default function HowItWorksV2() {
                     </span>
                   </div>
                 </div>
-                {/* Step content */}
+
+                {/* Content */}
                 <div className="md:w-1/2 flex flex-col justify-center items-center md:items-start text-center md:text-left">
                   <h2 className="text-3xl md:text-4xl font-extrabold mb-3 text-primary drop-shadow-lg tracking-tight animate-fade-in">
                     {step.title}
@@ -237,10 +276,11 @@ export default function HowItWorksV2() {
                   </div>
                 </div>
               </div>
-            ))}
-          </AnimatedBackground>
+            </AnimatedBackground>
+          ))}
         </section>
       </main>
+
       <Footer />
     </div>
   );
