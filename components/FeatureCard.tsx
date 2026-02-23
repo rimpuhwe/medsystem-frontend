@@ -1,21 +1,28 @@
-import { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
+import { motion } from "framer-motion";
 
-export interface FeatureCardProps {
-  icon: LucideIcon;
+export default function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: ReactNode;
   title: string;
   description: string;
-}
-
-export default function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
+}) {
   return (
-    <div className="group p-6 sm:p-8 text-center bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 min-h-[250px] sm:min-h-[280px]" style={{boxShadow: '-3px 0 0 #E8ECED'}}>
-      <Icon className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500 mx-auto mb-4 group-hover:scale-110 transition-transform duration-200" />
-      <h3 className="font-semibold mb-3 text-blue-500 text-sm sm:text-base lg:text-lg">
-        {title}
-      </h3>
-      <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-        {description}
-      </p>
-    </div>
+    <motion.div
+      whileHover={{
+        y: -8,
+        scale: 1.04,
+        boxShadow: "0 8px 32px 0 rgba(34,197,94,0.10)",
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="bg-card border border-border rounded-xl p-6 flex flex-col items-center text-center shadow-sm min-h-[260px]"
+    >
+      <div className="mb-4 text-primary">{icon}</div>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground">{description}</p>
+    </motion.div>
   );
 }
