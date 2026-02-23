@@ -184,7 +184,7 @@ export default function HowItWorksV2() {
       {/* Hero Section with background image and overlay */}
       <div className="relative w-full h-[340px] md:h-[420px] mt-15 flex items-center justify-center mb-8">
         <Image
-          src="/how-it-works-hero.jpg"
+          src="https://res.cloudinary.com/dcgmi6w24/image/upload/v1771838200/Healthcare_Facility_Enhances_Data_Security_with_MDM_clfckr.jpg"
           alt="How it works hero"
           fill
           className="object-cover object-center z-0"
