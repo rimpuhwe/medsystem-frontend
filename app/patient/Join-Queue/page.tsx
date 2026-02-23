@@ -1,6 +1,6 @@
 "use client";
 
-import JoinQueueForm from "@/components/queue/joinQueueForm"; // File does not exist
+import JoinQueueForm from "@/components/queue/JoinQueueForm"; 
 
 export default function JoinQueuePage() {
   return (
