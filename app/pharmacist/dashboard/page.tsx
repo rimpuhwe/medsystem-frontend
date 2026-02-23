@@ -22,11 +22,14 @@ import {
   Cell,
 } from "recharts";
 
-const COLORS = ["#16a34a", "#3b82f6", "#f59e0b", "#8b5cf6"]; // emerald, blue, amber, purple
+/* ================= CATEGORY COLORS ================= */
+/* Purple - Antibiotics | Blue - Painkillers | Green - Vitamins | Amber - Others */
+const COLORS = ["#8b5cf6", "#3b82f6", "#16a34a", "#f59e0b"];
 
 export default function PharmacistDashboard() {
   const router = useRouter();
 
+  /* ================= KPI DATA ================= */
   const kpis = [
     { title: "Today's Revenue", value: "$1,250", icon: TrendingUp, color: "text-blue-600" },
     { title: "Total Medicines", value: "320", icon: Package, color: "text-emerald-600" },
@@ -34,6 +37,7 @@ export default function PharmacistDashboard() {
     { title: "Pending Dispenses", value: "5", icon: ClipboardList, color: "text-purple-600" },
   ];
 
+  /* ================= REVENUE DATA ================= */
   const revenueData = [
     { day: "Mon", revenue: 400 },
     { day: "Tue", revenue: 600 },
@@ -42,6 +46,7 @@ export default function PharmacistDashboard() {
     { day: "Fri", revenue: 1100 },
   ];
 
+  /* ================= CATEGORY DATA ================= */
   const categoryData = [
     { name: "Antibiotics", value: 40 },
     { name: "Painkillers", value: 30 },
@@ -52,7 +57,7 @@ export default function PharmacistDashboard() {
   return (
     <div className="space-y-10">
 
-      {/* KPI SECTION */}
+      {/* ================= KPI SECTION ================= */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {kpis.map((kpi, i) => {
           const Icon = kpi.icon;
@@ -73,12 +78,14 @@ export default function PharmacistDashboard() {
         })}
       </div>
 
-      {/* QUICK ACTIONS */}
+      {/* ================= QUICK ACTIONS ================= */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <p className="text-gray-600 mb-6">Frequently used features</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Quick Actions</h2>
+        <p className="text-gray-600 mb-6 text-sm">
+          Frequently used features
+        </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <button
             onClick={() => router.push("/pharmacist/dispense")}
             className="bg-emerald-600 text-white p-4 rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-700 transition shadow-sm"
@@ -102,44 +109,178 @@ export default function PharmacistDashboard() {
         </div>
       </div>
 
-      {/* CHARTS */}
+      {/* ================= CHARTS ================= */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        {/* Revenue Chart */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Revenue Overview</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">
+            Revenue Overview
+          </h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={revenueData}>
               <XAxis dataKey="day" stroke="#9ca3af" />
               <YAxis stroke="#9ca3af" />
               <Tooltip />
-              <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={3} />
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#3b82f6"
+                strokeWidth={3}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
+        {/* Pie Chart */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Sales by Category</h3>
+          <h3 className="font-semibold text-gray-900 mb-4">
+            Sales by Category
+          </h3>
+
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
-              <Pie data={categoryData} dataKey="value" nameKey="name" outerRadius={80}>
+              <Pie
+                data={categoryData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={80}
+              >
                 {categoryData.map((_, index) => (
                   <Cell key={index} fill={COLORS[index]} />
                 ))}
               </Pie>
-            </PieChart>
               <Tooltip />
-            </ResponsiveContainer>
-          </div>
-        </div>
+            </PieChart>
+          </ResponsiveContainer>
 
-        {/* RECENT ACTIVITY */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Recent Transactions</h3>
-          <div className="text-sm text-gray-600 space-y-2">
-            <div>• John Doe - Amoxicillin - $80</div>
-            <div>• Jane Smith - Paracetamol - $25</div>
-            <div>• Stock updated: Cetirizine +50 units</div>
+          {/* Legend */}
+          <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
+            {categoryData.map((entry, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <span
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: COLORS[index] }}
+                />
+                <span className="text-gray-600">{entry.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
+
+      {/* ================= ACTIVITY + ALERTS ================= */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="font-semibold text-gray-900 mb-6">
+            Recent Activity
+          </h3>
+
+          <div className="space-y-4 text-sm">
+            <ActivityItem
+              color="bg-green-500"
+              title="Jean Baptiste Nkurunziza"
+              subtitle="Prescription dispensed"
+              time="2 minutes ago"
+            />
+            <ActivityItem
+              color="bg-yellow-500"
+              title="Marie Claire Uwimana"
+              subtitle="New prescription scanned"
+              time="5 minutes ago"
+            />
+            <ActivityItem
+              color="bg-red-500"
+              title="David Mugisha"
+              subtitle="Prescription rejected - Allergy alert"
+              time="12 minutes ago"
+            />
+            <ActivityItem
+              color="bg-green-500"
+              title="Grace Mukamana"
+              subtitle="Prescription dispensed"
+              time="18 minutes ago"
+            />
+          </div>
+        </div>
+
+        {/* System Alerts */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="font-semibold text-gray-900 mb-6">
+            System Alerts
+          </h3>
+
+          <div className="space-y-4 text-sm">
+            <AlertCard
+              bg="bg-amber-50"
+              title="Low Stock Alert"
+              subtitle="Paracetamol 500mg running low (12 units remaining)"
+              color="text-amber-600"
+            />
+            <AlertCard
+              bg="bg-green-50"
+              title="System Update"
+              subtitle="Database backup completed successfully"
+              color="text-green-600"
+            />
+            <AlertCard
+              bg="bg-blue-50"
+              title="Performance Report"
+              subtitle="23% increase in prescription processing speed this week"
+              color="text-blue-600"
+            />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+/* ================= REUSABLE COMPONENTS ================= */
+
+function ActivityItem({
+  color,
+  title,
+  subtitle,
+  time,
+}: {
+  color: string;
+  title: string;
+  subtitle: string;
+  time: string;
+}) {
+  return (
+    <div className="flex items-start justify-between bg-gray-50 rounded-lg p-3">
+      <div className="flex items-start gap-3">
+        <span className={`w-2.5 h-2.5 rounded-full mt-2 ${color}`} />
+        <div>
+          <p className="font-medium text-gray-800">{title}</p>
+          <p className="text-gray-500 text-xs">{subtitle}</p>
+        </div>
+      </div>
+      <span className="text-xs text-gray-400">{time}</span>
+    </div>
+  );
+}
+
+function AlertCard({
+  bg,
+  title,
+  subtitle,
+  color,
+}: {
+  bg: string;
+  title: string;
+  subtitle: string;
+  color: string;
+}) {
+  return (
+    <div className={`${bg} rounded-lg p-4`}>
+      <p className={`font-medium ${color}`}>{title}</p>
+      <p className="text-gray-500 text-xs mt-1">{subtitle}</p>
+    </div>
   );
 }
