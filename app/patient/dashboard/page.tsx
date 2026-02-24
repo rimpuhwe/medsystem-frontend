@@ -20,7 +20,7 @@ const [token, setToken] = useState("");
     setToken(storedToken);
     const loadData = async () => {
       try {
-        const profileRes = await apiRequest("/api/patient", storedToken);
+        const profileRes = await apiRequest("https://medsystemapplication.onrender.com/api/patient", storedToken);
 
         if (profileRes.ok)
           setProfile(await profileRes.json());
