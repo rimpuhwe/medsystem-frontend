@@ -113,14 +113,14 @@ const LoginPage: React.FC = () => {
               </button>
 
 
-              {/* Divider */}
+               {/* Divider */}
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-white/30"></div>
+                  <div className="w-full border-t border-gray-300"></div>
                 </div>
 
                 <div className="relative flex justify-center text-xs">
-                  <span className="px-3 bg-transparent text-white/70">
+                  <span className="px-3  text-white">
                     OR CONTINUE WITH
                   </span>
                 </div>
