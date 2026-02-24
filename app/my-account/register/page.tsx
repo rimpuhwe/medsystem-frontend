@@ -7,22 +7,104 @@ import { useRouter } from 'next/navigation';
 
 type UserType = 'patient' | 'pharmacist';
 
-
 const RegisterPage: React.FC = () => {
+  const router = useRouter();
 
-    const router = useRouter();
   const [userType, setUserType] = useState<UserType>('patient');
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const isPatient = userType === 'patient';
   const totalSteps = 3;
 
-  /* =========================
-     THEME
-  ========================== */
+  // ✅ CENTRALIZED FORM STATE (FIXES NULL PAYLOAD ISSUE)
+  const [formValues, setFormValues] = useState<any>({});
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormValues((prev: any) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const nextStep = () => step < totalSteps && setStep(step + 1);
+  const prevStep = () => step > 1 && setStep(step - 1);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (userType === 'patient') {
+        const payload = {
+          fullName: formValues.beneficiaryName,
+          email: formValues.email,
+          phone: formValues.patientPhone,
+          password: formValues.password,
+          gender: formValues.patientGender,
+          dateOfBirth: new Date(formValues.dateOfBirth).toISOString(),
+          insurance: formValues.insuranceProvider,
+          insuranceNumber: formValues.insuranceNumber,
+          insuranceHolder: formValues.insuranceHolder,
+          holderEmployer: formValues.holderEmployer,
+        };
+
+        const res = await fetch(
+          'https://medsystemapplication.onrender.com/api/auth/register/patient',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(errorData?.message || 'Patient registration failed');
+        }
+
+        localStorage.setItem('pendingVerificationEmail', payload.email);
+        router.push('/my-account/verify-otp');
+      } else {
+        const payload = {
+          fullName: formValues.pharmacistName,
+          email: formValues.email,
+          phone: formValues.pharmacistPhone,
+          password: formValues.password,
+          gender: formValues.pharmacistGender,
+          pharmacyName: formValues.pharmacyName,
+          licenseNumber: formValues.licenseNumber,
+        };
+
+        const res = await fetch(
+          'https://medsystemapplication.onrender.com/api/auth/register/pharmacy',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          throw new Error(errorData?.message || 'Pharmacist registration failed');
+        }
+
+        localStorage.setItem('pendingVerificationEmail', payload.email);
+        router.push('/my-account/verify-otp');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const theme = {
     primary: isPatient ? '#2f5daa' : '#22c55e',
     gradientFrom: isPatient ? '#2f5daa' : '#22c55e',
@@ -31,95 +113,6 @@ const RegisterPage: React.FC = () => {
     buttonFrom: isPatient ? '#4c7cf3' : '#4ade80',
     buttonTo: isPatient ? '#3c63c7' : '#22c55e',
   };
-
-  /* =========================
-     STEP NAVIGATION
-  ========================== */
-  const nextStep = () => step < totalSteps && setStep(step + 1);
-  const prevStep = () => step > 1 && setStep(step - 1);
-
-  /* =========================
-     API SUBMIT HANDLER
-  ========================== */
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  setLoading(true);
-  setError(null);
-  setSuccess(null);
-
-  const formData = new FormData(e.currentTarget);
-
-  try {
-    if (userType === 'patient') {
-      const payload = {
-        fullName: formData.get('beneficiaryName') as string,
-        email: formData.get('email') as string,
-        phone: formData.get('patientPhone') as string,
-        password: formData.get('password') as string,
-        gender: formData.get('patientGender') as string,
-        dateOfBirth: new Date(
-          formData.get('dateOfBirth') as string
-        ).toISOString(),
-        insurance: formData.get('insuranceProvider') as string,
-        insuranceNumber: formData.get('insuranceNumber') as string,
-        insuranceHolder: formData.get('insuranceHolder') as string,
-        holderEmployer: formData.get('holderEmployer') as string,
-      };
-
-      const res = await fetch(
-        'https://medsystemapplication.onrender.com/api/auth/register/patient',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.message || 'Patient registration failed');
-      }
-
-      localStorage.setItem('pendingVerificationEmail', payload.email);
-      router.push('/my-account/verify-otp');
-    } else {
-      const payload = {
-        fullName: formData.get('pharmacistName') as string,
-        email: formData.get('email') as string,
-        phone: formData.get('pharmacistPhone') as string,
-        password: formData.get('password') as string,
-        gender: formData.get('pharmacistGender') as string,
-        pharmacyName: formData.get('pharmacyName') as string,
-        licenseNumber: formData.get('licenseNumber') as string,
-      };
-
-      const res = await fetch(
-        'https://medsystemapplication.onrender.com/api/auth/register/pharmacy',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.message || 'Pharmacist registration failed');
-      }
-
-      localStorage.setItem('pendingVerificationEmail', payload.email);
-      router.push('/my-account/verify-otp');
-    }
-
-    e.currentTarget.reset();
-    setStep(1);
-  } catch (err: any) {
-    setError(err.message || 'Something went wrong.');
-  } finally {
-    setLoading(false);
-  }
-};
-
   const handleGoogleSignIn = () => {
     console.log('Google Sign-In Clicked');
   };
@@ -201,53 +194,50 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 </div>
               )}
 
-              {success && (
-                <div className="bg-green-100 text-green-600 text-sm p-2 rounded border border-green-300">
-                  {success}
-                </div>
-              )}
+        
 
               {/* PATIENT STEPS */}
               {isPatient && step === 1 && (
                 <>
-                  <Input label="Full Name" name="beneficiaryName" theme={theme} />
-                  <Input label="Phone" name="patientPhone" theme={theme} />
-                  <Input label="Date of Birth" name="dateOfBirth" type="date" theme={theme} />
-                  <Select name="patientGender" theme={theme} />
-                </>
+                <Input label="Full Name" name="beneficiaryName" value={formValues.beneficiaryName} onChange={handleChange} theme={theme} />
+                <Input label="Phone" name="patientPhone" value={formValues.patientPhone} onChange={handleChange} theme={theme} />
+                <Input label="Date of Birth" type="date" name="dateOfBirth" value={formValues.dateOfBirth} onChange={handleChange} theme={theme} />
+                <Select name="patientGender" value={formValues.patientGender} onChange={handleChange} theme={theme} />
+              </>
               )}
 
               {isPatient && step === 2 && (
-                <>
-                  <Input label="Insurance Provider" name="insuranceProvider" theme={theme} />
-                  <Input label="Insurance Number" name="insuranceNumber" theme={theme} />
-                  <Input label="Insurance Holder" name="insuranceHolder" theme={theme} />
-                  <Input label="Holder Employer" name="holderEmployer" theme={theme} />
-                </>
-              )}
+                 <>
+                <Input label="Insurance Provider" name="insuranceProvider" value={formValues.insuranceProvider} onChange={handleChange} theme={theme} />
+                <Input label="Insurance Number" name="insuranceNumber" value={formValues.insuranceNumber} onChange={handleChange} theme={theme} />
+                <Input label="Insurance Holder" name="insuranceHolder" value={formValues.insuranceHolder} onChange={handleChange} theme={theme} />
+                <Input label="Holder Employer" name="holderEmployer" value={formValues.holderEmployer} onChange={handleChange} theme={theme} />
+              </>
+            )}
+            
 
               {/* PHARMACIST STEPS */}
               {!isPatient && step === 1 && (
-                <>
-                  <Input label="Full Name" name="pharmacistName" theme={theme} />
-                  <Select name="pharmacistGender" theme={theme} />
-                  <Input label="Phone" name="pharmacistPhone" theme={theme} />
-                </>
+               <>
+                <Input label="Full Name" name="pharmacistName" value={formValues.pharmacistName} onChange={handleChange} theme={theme} />
+                <Select name="pharmacistGender" value={formValues.pharmacistGender} onChange={handleChange} theme={theme} />
+                <Input label="Phone" name="pharmacistPhone" value={formValues.pharmacistPhone} onChange={handleChange} theme={theme} />
+              </>
               )}
 
               {!isPatient && step === 2 && (
-                <>
-                  <Input label="Pharmacy Name" name="pharmacyName" theme={theme} />
-                  <Input label="License Number" name="licenseNumber" theme={theme} />
-                </>
+                  <>
+                <Input label="Pharmacy Name" name="pharmacyName" value={formValues.pharmacyName} onChange={handleChange} theme={theme} />
+                <Input label="License Number" name="licenseNumber" value={formValues.licenseNumber} onChange={handleChange} theme={theme} />
+              </>
               )}
 
               {/* SECURITY STEP */}
               {step === 3 && (
                 <>
-                  <Input label="Email" name="email" type="email" theme={theme} />
-                  <Input label="Password" name="password" type="password" theme={theme} />
-                </>
+                <Input label="Email" name="email" type="email" value={formValues.email} onChange={handleChange} theme={theme} />
+                <Input label="Password" name="password" type="password" value={formValues.password} onChange={handleChange} theme={theme} />
+              </>
               )}
 
               {/* NAVIGATION */}
@@ -313,33 +303,34 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
 export default RegisterPage;
 
-/* =========================
-   REUSABLE INPUT
-========================= */
-function Input({ label, name, theme, type = 'text' }: any) {
+
+/* REUSABLE INPUT */
+function Input({ label, name, theme, type = 'text', value, onChange }: any) {
   return (
     <div>
       <label className="text-gray-600 text-sm block mb-1">{label}</label>
       <input
         name={name}
         type={type}
+        value={value || ''}
+        onChange={onChange}
         required
-        className="w-full px-3 py-2 rounded border outline-none focus:ring-2"
+        className="w-full px-3 py-2 rounded border outline-none"
         style={{ borderColor: theme.border }}
       />
     </div>
   );
 }
 
-/* =========================
-   GENDER SELECT
-========================= */
-function Select({ name, theme }: any) {
+/* REUSABLE SELECT */
+function Select({ name, theme, value, onChange }: any) {
   return (
     <div>
       <label className="text-gray-600 text-sm block mb-1">Gender</label>
       <select
         name={name}
+        value={value || ''}
+        onChange={onChange}
         required
         className="w-full px-3 py-2 rounded border outline-none"
         style={{ borderColor: theme.border }}
