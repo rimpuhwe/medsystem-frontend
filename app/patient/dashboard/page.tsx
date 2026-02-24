@@ -11,6 +11,8 @@ import { apiRequest } from "@/utils/api";
 export default function Dashboard() {
 const [profile, setProfile] = useState<any>(null);
 
+const token = localStorage.getItem("token") || "";
+
  // Load all patient data
   useEffect(() => {
     const loadData = async () => {
@@ -47,7 +49,7 @@ const [profile, setProfile] = useState<any>(null);
           </div>
           
           <div className="lg:col-span-1 space-y-6">
-            <JoinQueue token={localStorage.getItem("token")||""} />
+            <JoinQueue token={token} />
             <MedicalHistory />
           </div>
         </div>
