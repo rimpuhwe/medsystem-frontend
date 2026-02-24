@@ -50,7 +50,7 @@ export default function JoinQueue({ token }: { token: string }) {
         </p>
 
         <button
-          onClick={() => (window.location.href = "/patient/queue")}
+          onClick={() => (window.location.href = "/patient/Queue")}
           className="w-full bg-blue-500 text-white py-3 rounded-md"
         >
           Join Queue Now
