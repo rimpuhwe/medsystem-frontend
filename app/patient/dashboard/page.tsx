@@ -10,14 +10,17 @@ import { apiRequest } from "@/utils/api";
 
 export default function Dashboard() {
 const [profile, setProfile] = useState<any>(null);
+const [token, setToken] = useState("");
 
-const token = localStorage.getItem("token") || "";
+
 
  // Load all patient data
   useEffect(() => {
+    const storedToken = localStorage.getItem("token") || "";
+    setToken(storedToken);
     const loadData = async () => {
       try {
-        const profileRes = await apiRequest("/api/patient");
+        const profileRes = await apiRequest("/api/patient", storedToken);
 
         if (profileRes.ok)
           setProfile(await profileRes.json());
