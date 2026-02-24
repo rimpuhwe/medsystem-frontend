@@ -25,7 +25,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            <div className="flex items-center gap-2 text-blue-600 mb-4">
+            <div className="flex items-center gap-2 text-blue-600 ">
               <Shield className="w-5 h-5" />
               <span className="text-sm ">Republic of Rwanda - Ministry of Health</span>
             </div>
@@ -34,23 +34,21 @@ export default function Home() {
               <br />
               <span className="text-blue-600">Ordinance System</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-lg">
+            <p className="text-md md:text-xl text-muted-foreground mb-5 max-w-lg">
               Experience Rwanda's secure, efficient, and connected healthcare
               platform. Manage digital prescriptions with verified authenticity,
               and collaborate seamlessly between doctors, pharmacists, and
-              patients. This Digital System ensures your medical data is
-              protected, your care is coordinated, and your health is always
-              accessible anytime, anywhere.
+              patients.
             </p>
-            <div className="flex gap-4 w-full md:w-auto justify-center md:justify-start">
-              <Button href="#overview" variant="primary" className="bg-gradient-to-br from-blue-500 to-teal-400 text-white">
+            <div className="flex  gap-4 md:w-auto justify-center md:justify-start">
+              <Button href="#overview" variant="primary" className="bg-gradient-to-br from-blue-500 to-teal-400 text-white ">
                 Platform Overview
               </Button>
               <Button href="/dashboard/patient" variant="primary" className="bg-gradient-to-br from-blue-500 to-teal-400 text-white">
                 Access Medical Dashboard
               </Button>
             </div>
-            <div className="flex flex-wrap gap-3 mt-6 justify-end">
+            <div className="flex flex-wrap gap-3 mt-4 justify-end">
               {[
                 { tag: "MOH Certified" },
                 { tag: "HIPAA Compliant" },
@@ -78,10 +76,10 @@ export default function Home() {
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <Image
-              src="https://res.cloudinary.com/dcgmi6w24/image/upload/v1771571672/ChatGPT_Image_Feb_20_2026_09_10_38_AM_nbmzo0.png"
+              src="/healthcare-image.png"
               alt="Doctors, pharmacist, and patient interacting with the system"
-              width={850}
-              height={600}
+              width={600}
+              height={400}
               className="rounded-2xl shadow-2xl border border-border bg-card"
               priority
             />

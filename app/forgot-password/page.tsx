@@ -35,7 +35,7 @@ export default function ForgotPassword() {
     <main className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#090A0A" }}>
       <div className="w-full max-w-md">
         <div className="bg-white rounded-xl shadow-2xl p-8">
-          <button onClick={() => router.push("/login")} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6">
+          <button onClick={() => router.push("/my-account/login")} className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6">
             <ArrowLeft className="w-4 h-4" />
             Back to Login
           </button>
