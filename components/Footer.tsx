@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="w-full py-8 bg-primary border-t border-border flex flex-col items-center text-center text-xs text-muted-foreground">
+    <footer className="w-full py-8 bg-blue-500 border-t border-border flex flex-col items-center text-center text-xs text-white">
       <div className="mb-2 font-semibold">
         Digital Medical Ordinance System
       </div>

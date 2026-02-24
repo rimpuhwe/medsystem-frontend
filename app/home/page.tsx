@@ -26,9 +26,9 @@ export default function Home() {
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <div className="flex items-center gap-2 text-blue-600 mb-4">
-                <Shield className="w-5 h-5" />
-                <span className="text-sm ">Republic of Rwanda - Ministry of Health</span>
-              </div>
+              <Shield className="w-5 h-5" />
+              <span className="text-sm ">Republic of Rwanda - Ministry of Health</span>
+            </div>
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6 animate-fade-in-up">
               Digital Medical
               <br />
@@ -43,10 +43,10 @@ export default function Home() {
               accessible anytime, anywhere.
             </p>
             <div className="flex gap-4 w-full md:w-auto justify-center md:justify-start">
-              <Button href="#overview" variant="primary">
+              <Button href="#overview" variant="primary" className="bg-gradient-to-br from-blue-500 to-teal-400 text-white">
                 Platform Overview
               </Button>
-              <Button href="/dashboard/patient" variant="outline">
+              <Button href="/dashboard/patient" variant="primary" className="bg-gradient-to-br from-blue-500 to-teal-400 text-white">
                 Access Medical Dashboard
               </Button>
             </div>
@@ -100,32 +100,32 @@ export default function Home() {
         </p>
         <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 gap-8 w-full max-w-6xl">
           <FeatureCard
-            icon={<Stethoscope className="w-8 h-8" />}
+            icon={<Stethoscope className="w-8 h-8 text-blue-600" />}
             title="Doctor & Patient Management"
             description="Easily manage patient records, appointments, and communication between doctors and patients in a secure environment."
           />
           <FeatureCard
-            icon={<FileText className="w-8 h-8" />}
+            icon={<FileText className="w-8 h-8 text-blue-600" />}
             title="Digital Prescriptions"
             description="Create, send, and track digital prescriptions with verified authenticity, reducing errors and fraud."
           />
           <FeatureCard
-            icon={<ShieldCheck className="w-8 h-8" />}
+            icon={<ShieldCheck className="w-8 h-8 text-blue-600" />}
             title="Data Security & Compliance"
             description="HIPAA-compliant and MOH-certified, your data is encrypted and protected at every step."
           />
           <FeatureCard
-            icon={<Users className="w-8 h-8" />}
+            icon={<Users className="w-8 h-8 text-blue-600" />}
             title="Multi-role Access"
             description="Role-based dashboards for patients, doctors, pharmacists, and administrators for tailored experiences."
           />
           <FeatureCard
-            icon={<FileText className="w-8 h-8" />}
+            icon={<FileText className="w-8 h-8 text-blue-600" />}
             title="Medicine Dispensing"
             description="Pharmacists can view, verify, and dispense digital prescriptions efficiently, ensuring safe and accurate medication delivery."
           />
           <FeatureCard
-            icon={<Clock className="w-8 h-8" />}
+            icon={<Clock className="w-8 h-8 text-blue-600" />}
             title="24/7 Platform Availability"
             description="Access your medical data and services anytime, anywhere, with high system uptime."
           />

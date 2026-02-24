@@ -1,11 +1,41 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Shield } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
+import { api } from '@/lib/api';
 
 const LoginPage: React.FC = () => {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await api.auth.login(email, password);
+      localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+
+      const role = response.user.role;
+      if (role === 'doctor') router.push('/doctor/dashboard');
+      else if (role === 'patient') router.push('/patient/dashboard');
+      else if (role === 'pharmacist') router.push('/pharmacist/dashboard');
+      else router.push('/home');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = () => {
     console.log('Google Sign-In clicked');
   };
@@ -23,13 +53,13 @@ const LoginPage: React.FC = () => {
           <div className="text-center">
 
             <div className="flex justify-center mb-4">
-              
+
               <Shield className="w-12 h-12 text-[#2f5daa]" />
-              
+
             </div>
 
             <h1 className="text-[#2f5daa] font-bold text-2xl tracking-wide">
-               Secure access to your healthcare dashboard.
+              Secure access to your healthcare dashboard.
             </h1>
 
             <p className="text-gray-500 text-sm mt-2">
@@ -53,8 +83,13 @@ const LoginPage: React.FC = () => {
         <div className="w-1/2 flex items-center justify-center relative z-10">
 
           <div className="w-[320px]">
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+                {error}
+              </div>
+            )}
 
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
 
               {/* Email */}
               <div>
@@ -65,6 +100,8 @@ const LoginPage: React.FC = () => {
                 <input
                   type="email"
                   placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-3 py-2 rounded bg-white text-sm outline-none"
                   required
                 />
@@ -80,6 +117,8 @@ const LoginPage: React.FC = () => {
                 <input
                   type="password"
                   placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-2 rounded bg-white text-sm outline-none"
                   required
                 />
@@ -94,7 +133,7 @@ const LoginPage: React.FC = () => {
                   Remember me
                 </label>
 
-                <a href="#" className="text-blue-200 hover:underline">
+                <a href="/forgot-password" className="text-blue-200 hover:underline">
                   Recover password
                 </a>
 
@@ -104,12 +143,14 @@ const LoginPage: React.FC = () => {
               {/* Sign In */}
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full py-2 rounded
                 bg-gradient-to-r from-[#4c7cf3] to-[#3c63c7]
                 text-white font-semibold text-sm
-                hover:brightness-110 transition"
+                hover:brightness-110 transition
+                disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                SIGN IN
+                {loading ? 'SIGNING IN...' : 'SIGN IN'}
               </button>
 
 

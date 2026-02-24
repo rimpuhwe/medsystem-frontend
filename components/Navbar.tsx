@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { User } from "lucide-react";
+import { Stethoscope, User } from "lucide-react";
 import { useState, useRef } from "react";
 
 const navLinks = [
@@ -18,14 +18,23 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <motion.span
+      {/* <motion.span
         className="text-2xl font-bold tracking-tight text-primary"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        MedEase
-      </motion.span>
+        MedEase */}
+      {/* </motion.span> */}
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+          <Stethoscope className="text-white w-6 h-6" />
+        </div>
+        <div className="hidden sm:block">
+          <h1 className="text-xl  text-gray-900">MedEase</h1>
+          <p className="text-sm text-gray-600">Rwanda Digital Health</p>
+        </div>
+      </div>
       <div className="flex gap-6 text-base font-medium items-center">
         {navLinks.map((link, i) => (
           <motion.div
