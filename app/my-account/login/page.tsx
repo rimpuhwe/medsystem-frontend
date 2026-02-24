@@ -54,8 +54,6 @@ const LoginPage: React.FC = () => {
       //   },
       // });
 
-      // Optional: show login message
-      if (Message) alert(Message);
 
       // Redirect based on role
       switch (Role) {
