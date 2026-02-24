@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 
 const clinics = ["Kigali Hospital", "Butare Medical Center", "Gisenyi Clinic"];
@@ -8,9 +8,10 @@ const departments = ["General Medicine", "Pediatrics", "Cardiology"];
 
 export default function QueuePage() {
   const router = useRouter();
-  const token = localStorage.getItem("token"); // JWT from login
+// JWT from login
 
   const [step, setStep] = useState(1);
+  const [token, setToken] = useState<string | null>();
   const [clinic, setClinic] = useState("");
   const [department, setDepartment] = useState("");
   const [doctor, setDoctor] = useState("");
@@ -20,6 +21,10 @@ export default function QueuePage() {
   const [error, setError] = useState("");
 
   // Step 1: Fetch queue summary
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+  }, []);
   const fetchQueueSummary = async () => {
     if (!clinic || !department) return;
 
