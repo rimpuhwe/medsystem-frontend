@@ -11,7 +11,7 @@ export default function JoinQueue({ token }: { token: string }) {
     const fetchQueue = async () => {
       try {
         const res = await fetch(
-          "https://medsystemapplication.onrender.com//api/patient/queue/join",
+          "https://medsystemapplication.onrender.com/api/patient/queue/join",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ export default function JoinQueue({ token }: { token: string }) {
         </p>
 
         <button
-          onClick={() => (window.location.href = "/patient/queue-page")}
+          onClick={() => (window.location.href = "/patient/queue")}
           className="w-full bg-blue-500 text-white py-3 rounded-md"
         >
           Join Queue Now
