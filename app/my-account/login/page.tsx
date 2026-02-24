@@ -1,15 +1,72 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Shield } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 
 const LoginPage: React.FC = () => {
-  const handleGoogleSignIn = () => {
-    console.log('Google Sign-In clicked');
+  const router = useRouter();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      // Call your backend login API
+      const response = await fetch('https://your-backend.com/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
+      }
+
+      const data = await response.json();
+      const { token, role, message} = data;
+
+      // Store token and role securely in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+
+      // Display success message
+     !error? alert(message): alert(error);
+
+      // Redirect to dashboard based on role
+      switch (role) {
+        case 'ADMIN':
+          router.push('/admin/dashboard');
+          break;
+        case 'DOCTOR':
+          router.push('/doctor/dashboard');
+          break;
+        case 'PATIENT':
+          router.push('/patient/dashboard');
+          break;
+        default:
+          router.push('/my-account/login');
+      }
+
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleGoogleSignIn = () => {
+    console.log('Google Sign-In clicked');
+    
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f2f4f8] px-4">
 
@@ -67,6 +124,8 @@ const LoginPage: React.FC = () => {
                   placeholder="Enter your email"
                   className="w-full px-3 py-2 rounded bg-white text-sm outline-none"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -82,6 +141,8 @@ const LoginPage: React.FC = () => {
                   placeholder="Enter your password"
                   className="w-full px-3 py-2 rounded bg-white text-sm outline-none"
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
 
@@ -108,8 +169,9 @@ const LoginPage: React.FC = () => {
                 bg-gradient-to-r from-[#4c7cf3] to-[#3c63c7]
                 text-white font-semibold text-sm
                 hover:brightness-110 transition"
+                disabled={loading}
               >
-                SIGN IN
+                {loading ? 'Signing in...' : 'SIGN IN'}
               </button>
 
 
@@ -150,6 +212,7 @@ const LoginPage: React.FC = () => {
               <Link
                 href="/my-account/register"
                 className="text-white font-semibold hover:underline"
+                
               >
                 Sign up
               </Link>
