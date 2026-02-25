@@ -59,7 +59,7 @@ export default function Sidebar({ dashboardType }: SidebarProps) {
         id: "queue",
         icon: Clock,
         label: "Patient Queue",
-        path: "/doctor/patient-Queue",
+        path: "/doctor/patientsQueue",
       },
       {
         id: "create-prescription",
@@ -178,11 +178,10 @@ export default function Sidebar({ dashboardType }: SidebarProps) {
                   router.push(item.path);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-sm flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? `${config.activeBg} text-white`
-                    : `text-gray-300 ${config.hoverBg} hover:text-white`
-                }`}
+                className={`w-full text-sm flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                  ? `${config.activeBg} text-white`
+                  : `text-gray-300 ${config.hoverBg} hover:text-white`
+                  }`}
               >
                 <Icon className="w-5 h-5" />
                 <span>{item.label}</span>
