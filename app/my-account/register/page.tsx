@@ -194,50 +194,50 @@ const RegisterPage: React.FC = () => {
                 </div>
               )}
 
-        
+
 
               {/* PATIENT STEPS */}
               {isPatient && step === 1 && (
                 <>
-                <Input label="Full Name" name="beneficiaryName" value={formValues.beneficiaryName} onChange={handleChange} theme={theme} />
-                <Input label="Phone" name="patientPhone" value={formValues.patientPhone} onChange={handleChange} theme={theme} />
-                <Input label="Date of Birth" type="date" name="dateOfBirth" value={formValues.dateOfBirth} onChange={handleChange} theme={theme} />
-                <Select name="patientGender" value={formValues.patientGender} onChange={handleChange} theme={theme} />
-              </>
+                  <Input label="Full Name" name="beneficiaryName" value={formValues.beneficiaryName} onChange={handleChange} theme={theme} />
+                  <Input label="Phone" name="patientPhone" value={formValues.patientPhone} onChange={handleChange} theme={theme} />
+                  <Input label="Date of Birth" type="date" name="dateOfBirth" value={formValues.dateOfBirth} onChange={handleChange} theme={theme} />
+                  <Select name="patientGender" value={formValues.patientGender} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {isPatient && step === 2 && (
-                 <>
-                <Input label="Insurance Provider" name="insuranceProvider" value={formValues.insuranceProvider} onChange={handleChange} theme={theme} />
-                <Input label="Insurance Number" name="insuranceNumber" value={formValues.insuranceNumber} onChange={handleChange} theme={theme} />
-                <Input label="Insurance Holder" name="insuranceHolder" value={formValues.insuranceHolder} onChange={handleChange} theme={theme} />
-                <Input label="Holder Employer" name="holderEmployer" value={formValues.holderEmployer} onChange={handleChange} theme={theme} />
-              </>
-            )}
-            
+                <>
+                  <Input label="Insurance Provider" name="insuranceProvider" value={formValues.insuranceProvider} onChange={handleChange} theme={theme} />
+                  <Input label="Insurance Number" name="insuranceNumber" value={formValues.insuranceNumber} onChange={handleChange} theme={theme} />
+                  <Input label="Insurance Holder" name="insuranceHolder" value={formValues.insuranceHolder} onChange={handleChange} theme={theme} />
+                  <Input label="Holder Employer" name="holderEmployer" value={formValues.holderEmployer} onChange={handleChange} theme={theme} />
+                </>
+              )}
+
 
               {/* PHARMACIST STEPS */}
               {!isPatient && step === 1 && (
-               <>
-                <Input label="Full Name" name="pharmacistName" value={formValues.pharmacistName} onChange={handleChange} theme={theme} />
-                <Select name="pharmacistGender" value={formValues.pharmacistGender} onChange={handleChange} theme={theme} />
-                <Input label="Phone" name="pharmacistPhone" value={formValues.pharmacistPhone} onChange={handleChange} theme={theme} />
-              </>
+                <>
+                  <Input label="Full Name" name="pharmacistName" value={formValues.pharmacistName} onChange={handleChange} theme={theme} />
+                  <Select name="pharmacistGender" value={formValues.pharmacistGender} onChange={handleChange} theme={theme} />
+                  <Input label="Phone" name="pharmacistPhone" value={formValues.pharmacistPhone} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {!isPatient && step === 2 && (
-                  <>
-                <Input label="Pharmacy Name" name="pharmacyName" value={formValues.pharmacyName} onChange={handleChange} theme={theme} />
-                <Input label="License Number" name="licenseNumber" value={formValues.licenseNumber} onChange={handleChange} theme={theme} />
-              </>
+                <>
+                  <Input label="Pharmacy Name" name="pharmacyName" value={formValues.pharmacyName} onChange={handleChange} theme={theme} />
+                  <Input label="License Number" name="licenseNumber" value={formValues.licenseNumber} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {/* SECURITY STEP */}
               {step === 3 && (
                 <>
-                <Input label="Email" name="email" type="email" value={formValues.email} onChange={handleChange} theme={theme} />
-                <Input label="Password" name="password" type="password" value={formValues.password} onChange={handleChange} theme={theme} />
-              </>
+                  <Input label="Email" name="email" type="email" value={formValues.email} onChange={handleChange} theme={theme} />
+                  <Input label="Password" name="password" type="password" value={formValues.password} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {/* NAVIGATION */}

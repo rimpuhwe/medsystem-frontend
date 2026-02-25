@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
       }
 
       const data = await response.json();
-      const { Token, Role, Message} = data;
+      const { Token, Role, Message } = data;
 
       // Store token, role, and referenceNumber
       const token = localStorage.setItem("token", Token);
