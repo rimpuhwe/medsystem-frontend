@@ -15,8 +15,9 @@ function AddPatient() {
     gender: '',
     insuranceProvider: '',
     insuranceNumber: '',
-    chronicDiseases: '',
-    allergies: ''
+    insuranceHolder: '',
+    holderEmployer: '',
+    email: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -44,7 +45,7 @@ function AddPatient() {
     showSuccess(`Patient ${formData.fullName} saved successfully with ID: ${patientId}`);
     setFormData({
       fullName: '', dateOfBirth: '', phoneNumber: '', emergencyPhone: '',
-      gender: '', insuranceProvider: '', insuranceNumber: '', chronicDiseases: '', allergies: ''
+      gender: '', insuranceProvider: '', insuranceNumber: '', insuranceHolder: '', holderEmployer: '', email: ''
     });
   };
 
@@ -140,6 +141,29 @@ function AddPatient() {
                   </select>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                 <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter email address"
+                  className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* insurance details Section */}
+          <div>
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900">
+              Insurance Details
+              <Plus className="w-5 h-5 text-blue-600" />
+            </h3>
+            
+            <div className="bg-gray-50 p-6 rounded-lg space-y-4">
+               <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Insurance Provider</label>
                   <select
                     name="insuranceProvider"
@@ -154,9 +178,7 @@ function AddPatient() {
                     <option value="britam">BRITAM</option>
                   </select>
                 </div>
-              </div>
-
-              <div>
+               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Insurance Number</label>
                 <input
                   type="text"
@@ -167,37 +189,26 @@ function AddPatient() {
                   className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-            </div>
-          </div>
-
-          {/* Medical Information Section */}
-          <div>
-            <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900">
-              Medical Information
-              <Plus className="w-5 h-5 text-blue-600" />
-            </h3>
-            
-            <div className="bg-gray-50 p-6 rounded-lg space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Chronic Diseases</label>
-                <textarea
-                  name="chronicDiseases"
-                  value={formData.chronicDiseases}
+               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Insurance Holder</label>
+                <input
+                  type="text"
+                  name="insuranceHolder"
+                  value={formData.insuranceHolder}
                   onChange={handleInputChange}
-                  placeholder="List any chronic diseases or conditions"
-                  className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                  rows={3}
+                  placeholder="Enter insurance holder name"
+                  className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Allergies</label>
-                <textarea
-                  name="allergies"
-                  value={formData.allergies}
+               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Holder Employer</label>
+                <input
+                  type="text"
+                  name="holderEmployer"
+                  value={formData.holderEmployer}
                   onChange={handleInputChange}
-                  placeholder="List any known allergies"
-                  className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                  rows={3}
+                  placeholder="Enter holder employer"
+                  className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
