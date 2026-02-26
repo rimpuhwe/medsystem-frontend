@@ -2,11 +2,11 @@ import { Mail } from "lucide-react";
 
 export default function NewsletterSection() {
   return (
-    <section className="w-full py-24 flex flex-col items-center">
+    <section className="w-full py-24 flex flex-col items-center bg-gray-50">
       <div className="max-w-xl w-full flex flex-col items-center text-center">
         <div className="flex items-center justify-center mb-3 text-primary">
-          <Mail className="w-8 h-8 mr-2" />
-          <span className="font-semibold text-3xl md:text-4xl">Join our Newsletter</span>
+          <Mail className="w-8 h-8 mr-2 text-blue-600" />
+          <span className="font-semibold text-3xl md:text-4xl text-blue-600">Join our Newsletter</span>
         </div>
         <p className="mb-6 text-muted-foreground text-sm md:text-base">
           Stay up to date with the latest updates, health tips, and platform

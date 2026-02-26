@@ -56,7 +56,7 @@ export default function FAQPage() {
           {FAQS.map((item, idx) => (
             <div
               key={idx}
-              className="border border-border w-full rounded-lg bg-card overflow-hidden"
+              className="border border-border text-blue-500 w-full rounded-lg bg-card overflow-hidden"
             >
               <button
                 className="w-full flex items-center justify-between px-6 py-4 text-lg font-semibold text-left focus:outline-none hover:bg-primary/5 transition"

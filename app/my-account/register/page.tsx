@@ -118,19 +118,36 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f2f4f8] px-4">
-      <div className="relative w-full max-w-5xl h-[650px] bg-white rounded-md shadow-xl overflow-hidden flex border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-[#f2f4f8] px-4 py-8">
+      <div className="relative w-full max-w-5xl bg-white rounded-md shadow-xl overflow-hidden flex flex-col md:flex-row border border-gray-200">
 
-        {/* LEFT PANEL */}
+        {/* Step Indicator - Mobile (Top) */}
+        <div className="md:hidden w-full p-4 text-center" style={{ background: `linear-gradient(to right, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
+          <h2 className="text-white font-bold text-lg">
+            {isPatient ? 'Patient Registration' : 'Pharmacist Registration'}
+          </h2>
+          <p className="text-white/80 text-sm mt-1">Step {step} of {totalSteps}</p>
+          <div className="flex gap-2 mt-3 justify-center">
+            {[1, 2, 3].map((s) => (
+              <div
+                key={s}
+                className="w-10 h-2 rounded-full"
+                style={{ backgroundColor: step >= s ? '#fff' : 'rgba(255,255,255,0.4)' }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* LEFT PANEL - Desktop only */}
         <div
-          className="absolute left-0 top-0 w-[65%] h-full transition-all duration-500"
+          className="hidden md:block absolute left-0 top-0 w-[65%] h-full transition-all duration-500"
           style={{
             background: `linear-gradient(to bottom right, ${theme.gradientFrom}, ${theme.gradientTo})`,
             clipPath: 'polygon(0 0, 82% 0, 64% 100%, 0% 100%)',
           }}
         />
 
-        <div className="w-1/2 flex flex-col justify-center items-center text-white z-10">
+        <div className="hidden md:flex w-1/2 flex-col justify-center items-center text-white z-10">
           <div className="text-center">
             <div className="w-16 h-16 bg-white rounded-full mx-auto mb-4" />
             <h1 className="font-bold text-xl">
@@ -156,8 +173,8 @@ const RegisterPage: React.FC = () => {
         </div>
 
         {/* RIGHT FORM */}
-        <div className="w-1/2 flex items-center justify-center z-10">
-          <div className="w-[360px]">
+        <div className="w-full md:w-1/2 flex items-center justify-center z-10 p-6 md:p-0">
+          <div className="w-full max-w-[360px]">
 
             {/* USER TYPE SWITCH */}
             <div className="flex gap-3 mb-5">
@@ -194,50 +211,50 @@ const RegisterPage: React.FC = () => {
                 </div>
               )}
 
-        
+
 
               {/* PATIENT STEPS */}
               {isPatient && step === 1 && (
                 <>
-                <Input label="Full Name" name="beneficiaryName" value={formValues.beneficiaryName} onChange={handleChange} theme={theme} />
-                <Input label="Phone" name="patientPhone" value={formValues.patientPhone} onChange={handleChange} theme={theme} />
-                <Input label="Date of Birth" type="date" name="dateOfBirth" value={formValues.dateOfBirth} onChange={handleChange} theme={theme} />
-                <Select name="patientGender" value={formValues.patientGender} onChange={handleChange} theme={theme} />
-              </>
+                  <Input label="Full Name" name="beneficiaryName" value={formValues.beneficiaryName} onChange={handleChange} theme={theme} />
+                  <Input label="Phone" name="patientPhone" value={formValues.patientPhone} onChange={handleChange} theme={theme} />
+                  <Input label="Date of Birth" type="date" name="dateOfBirth" value={formValues.dateOfBirth} onChange={handleChange} theme={theme} />
+                  <Select name="patientGender" value={formValues.patientGender} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {isPatient && step === 2 && (
-                 <>
-                <Input label="Insurance Provider" name="insuranceProvider" value={formValues.insuranceProvider} onChange={handleChange} theme={theme} />
-                <Input label="Insurance Number" name="insuranceNumber" value={formValues.insuranceNumber} onChange={handleChange} theme={theme} />
-                <Input label="Insurance Holder" name="insuranceHolder" value={formValues.insuranceHolder} onChange={handleChange} theme={theme} />
-                <Input label="Holder Employer" name="holderEmployer" value={formValues.holderEmployer} onChange={handleChange} theme={theme} />
-              </>
-            )}
-            
+                <>
+                  <Input label="Insurance Provider" name="insuranceProvider" value={formValues.insuranceProvider} onChange={handleChange} theme={theme} />
+                  <Input label="Insurance Number" name="insuranceNumber" value={formValues.insuranceNumber} onChange={handleChange} theme={theme} />
+                  <Input label="Insurance Holder" name="insuranceHolder" value={formValues.insuranceHolder} onChange={handleChange} theme={theme} />
+                  <Input label="Holder Employer" name="holderEmployer" value={formValues.holderEmployer} onChange={handleChange} theme={theme} />
+                </>
+              )}
+
 
               {/* PHARMACIST STEPS */}
               {!isPatient && step === 1 && (
-               <>
-                <Input label="Full Name" name="pharmacistName" value={formValues.pharmacistName} onChange={handleChange} theme={theme} />
-                <Select name="pharmacistGender" value={formValues.pharmacistGender} onChange={handleChange} theme={theme} />
-                <Input label="Phone" name="pharmacistPhone" value={formValues.pharmacistPhone} onChange={handleChange} theme={theme} />
-              </>
+                <>
+                  <Input label="Full Name" name="pharmacistName" value={formValues.pharmacistName} onChange={handleChange} theme={theme} />
+                  <Select name="pharmacistGender" value={formValues.pharmacistGender} onChange={handleChange} theme={theme} />
+                  <Input label="Phone" name="pharmacistPhone" value={formValues.pharmacistPhone} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {!isPatient && step === 2 && (
-                  <>
-                <Input label="Pharmacy Name" name="pharmacyName" value={formValues.pharmacyName} onChange={handleChange} theme={theme} />
-                <Input label="License Number" name="licenseNumber" value={formValues.licenseNumber} onChange={handleChange} theme={theme} />
-              </>
+                <>
+                  <Input label="Pharmacy Name" name="pharmacyName" value={formValues.pharmacyName} onChange={handleChange} theme={theme} />
+                  <Input label="License Number" name="licenseNumber" value={formValues.licenseNumber} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {/* SECURITY STEP */}
               {step === 3 && (
                 <>
-                <Input label="Email" name="email" type="email" value={formValues.email} onChange={handleChange} theme={theme} />
-                <Input label="Password" name="password" type="password" value={formValues.password} onChange={handleChange} theme={theme} />
-              </>
+                  <Input label="Email" name="email" type="email" value={formValues.email} onChange={handleChange} theme={theme} />
+                  <Input label="Password" name="password" type="password" value={formValues.password} onChange={handleChange} theme={theme} />
+                </>
               )}
 
               {/* NAVIGATION */}
