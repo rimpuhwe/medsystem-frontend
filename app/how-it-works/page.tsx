@@ -274,11 +274,13 @@ export default function HowItWorksPage() {
             <div
               key={`${role}-${idx}`}
               data-index={idx}
-              ref={(node) =>
-                node
-                  ? stepRefs.current.set(idx, node)
-                  : stepRefs.current.delete(idx)
-              }
+              ref={(node) => {
+                if (node) {
+                  stepRefs.current.set(idx, node);
+                } else {
+                  stepRefs.current.delete(idx);
+                }
+              }}
               className={`transition-all duration-700 transform ${
                 visibleSteps.includes(idx)
                   ? "opacity-100 translate-y-0"
