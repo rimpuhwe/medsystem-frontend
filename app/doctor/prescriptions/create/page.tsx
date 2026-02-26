@@ -4,7 +4,7 @@ import { FileText, Plus, Search, Send, X } from "lucide-react";
 import React, { useState, ChangeEvent } from "react";
 import { useToast } from "../../../hooks/useToast";
 import { ToastContainer } from "../../../../components/Toast";
-import { apiRequest } from "../../../../lib/api";
+import { apiRequest } from "../../../../utils/api";
 
 function PatientFoundView({ patient }: { patient: any }) {
   return (
@@ -132,14 +132,21 @@ function CreatePrescription({}: CreatePrescriptionProps) {
     }
 
     try {
-      const patient = await apiRequest(
-        `/patient?patientReferenceNumber=${encodeURIComponent(
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("token") || ""
+          : "";
+
+      const response = await apiRequest(
+        `https://medsystemapplication.onrender.com/api/patient?patientReferenceNumber=${encodeURIComponent(
           patientId.trim()
         )}`,
-        "GET"
+        token
       );
+
+      const patient = await response.json();
       setFoundPatient(patient);
-      showSuccess(`Patient ${patient.name ?? ""} found!`);
+      showSuccess(`Patient ${patient.fullName ?? patient.name ?? ""} found!`);
     } catch (error: any) {
       console.error("Failed to fetch patient:", error);
       setFoundPatient(null);
@@ -176,19 +183,29 @@ function CreatePrescription({}: CreatePrescriptionProps) {
         allergies: splitToArray(formData.allergies),
       };
 
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("token") || ""
+          : "";
+
       const response = await apiRequest(
-        `/doctors/consultation?patientReferenceNumber=${encodeURIComponent(
+        `https://medsystemapplication.onrender.com/api/doctors/consultation?patientReferenceNumber=${encodeURIComponent(
           patientId.trim()
         )}`,
-        "POST",
-        payload
+        token,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
+        }
       );
+
+      const data = await response.json();
 
       showSuccess(
         `Consultation ${
           isDraft ? "saved as draft" : "created and sent"
         } successfully${
-          (response as any)?.id ? ` with ID: ${(response as any).id}` : ""
+          (data as any)?.id ? ` with ID: ${(data as any).id}` : ""
         }.`
       );
       setPatientId("");
