@@ -88,7 +88,7 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-[#f2f4f8] px-4">
       <div className="relative w-full max-w-5xl h-[540px] bg-white rounded-md shadow-[0_20px_40px_rgba(0,0,0,0.15)] overflow-hidden flex">
         {/* Left Side */}
-        <div className="w-1/2 bg-[#f5f7fa] flex flex-col items-center justify-center z-10">
+        <div className="hidden md:flex w-1/2 bg-[#f5f7fa] flex-col items-center justify-center z-10">
           <div className="text-center">
             <div className="flex justify-center mb-4">
               <Shield className="w-12 h-12 text-[#2f5daa]" />
@@ -105,13 +105,13 @@ const LoginPage: React.FC = () => {
 
         {/* Blue Background */}
         <div
-          className="absolute right-0 top-0 w-[65%] h-full
+          className="absolute right-0 top-0 w-full md:w-[65%] h-full
           bg-gradient-to-br from-[#2f5daa] to-[#244a8f]
-          [clip-path:polygon(18%_0,100%_0,100%_100%,0%_100%)]"
+          md:[clip-path:polygon(18%_0,100%_0,100%_100%,0%_100%)]"
         />
 
         {/* Right Side Form */}
-        <div className="w-1/2 flex items-center justify-center relative z-10">
+        <div className="w-full md:w-1/2 flex items-center justify-center relative z-10">
           <div className="w-[320px]">
             <form className="space-y-4" onSubmit={handleLogin}>
               {/* Email */}
