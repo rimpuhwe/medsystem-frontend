@@ -40,7 +40,7 @@ Generated on: ${new Date().toLocaleString()}
   }
 
   const handleViewOnline = () => {
-    window.open('/patientDashboard/dashboard/medical-record-view', '_blank')
+    window.open('/patient/medical-record-view', '_blank')
   }
 
   return (

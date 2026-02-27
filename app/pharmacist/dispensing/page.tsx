@@ -12,6 +12,7 @@ export default function ScanPrescriptionPage() {
   const [manualId, setManualId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [prescription, setPrescription] = useState<any>(null);
 
   const startScanning = async () => {
     if (!qrRef.current || scanning) return;
@@ -71,14 +72,17 @@ export default function ScanPrescriptionPage() {
     try {
       setLoading(true);
       setMessage("");
+      setPrescription(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/prescriptions/${id}`
-      );
+      const prescriptions = JSON.parse(localStorage.getItem('prescriptions') || '[]');
+      const found = prescriptions.find((p: any) => p.id === id || p.referenceId === id);
 
-      if (!res.ok) throw new Error();
-
-      setMessage("Prescription retrieved successfully ✅");
+      if (found) {
+        setPrescription(found);
+        setMessage("Prescription retrieved successfully ✅");
+      } else {
+        setMessage("Prescription not found ❌");
+      }
     } catch {
       setMessage("Failed to retrieve prescription ❌");
     } finally {
@@ -140,6 +144,34 @@ export default function ScanPrescriptionPage() {
 
             {message && (
               <p className="text-sm text-gray-600">{message}</p>
+            )}
+            
+            {prescription && (
+              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-2">Prescription Details</h3>
+                <div className="space-y-1 text-sm">
+                  <p><strong>Patient:</strong> {prescription.patientName}</p>
+                  <p><strong>Doctor:</strong> {prescription.doctorName}</p>
+                  <p><strong>Medicine:</strong> {prescription.medicineName}</p>
+                  <p><strong>Dosage:</strong> {prescription.dosage}</p>
+                  <p><strong>Frequency:</strong> {prescription.frequency}</p>
+                  <p><strong>Duration:</strong> {prescription.duration}</p>
+                  {prescription.instructions && <p><strong>Instructions:</strong> {prescription.instructions}</p>}
+                </div>
+                <button
+                  onClick={() => {
+                    const dispensed = JSON.parse(localStorage.getItem('dispensedPrescriptions') || '[]');
+                    dispensed.push({ ...prescription, dispensedAt: new Date().toISOString() });
+                    localStorage.setItem('dispensedPrescriptions', JSON.stringify(dispensed));
+                    setMessage("Prescription dispensed successfully ✅");
+                    setPrescription(null);
+                    setManualId("");
+                  }}
+                  className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm transition"
+                >
+                  Dispense Medicine
+                </button>
+              </div>
             )}
           </div>
         </SectionCard>

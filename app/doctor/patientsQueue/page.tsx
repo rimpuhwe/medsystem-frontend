@@ -26,7 +26,7 @@ export default function PatientQueue() {
   }, []);
 
   const loadQueue = () => {
-    const savedQueue = localStorage.getItem('patientQueue');
+    const savedQueue = localStorage.getItem('doctorQueue');
     if (savedQueue) {
       try {
         const queueData = JSON.parse(savedQueue);
@@ -37,7 +37,7 @@ export default function PatientQueue() {
         setActiveConsultation(inConsultation || null);
       } catch (error) {
         console.warn('Failed to parse queue data:', error);
-        localStorage.removeItem('patientQueue');
+        localStorage.removeItem('doctorQueue');
         setQueue([]);
       }
     }
@@ -80,7 +80,8 @@ export default function PatientQueue() {
       );
       setQueue(updatedQueue);
       setActiveConsultation(nextPatient);
-      localStorage.setItem('patientQueue', JSON.stringify(updatedQueue));
+      localStorage.setItem('doctorQueue', JSON.stringify(updatedQueue));
+      localStorage.setItem('currentPatient', JSON.stringify(nextPatient));
       broadcastUpdate();
       showSuccess(`Called ${nextPatient.name} for consultation`);
     } else {
@@ -95,7 +96,8 @@ export default function PatientQueue() {
       );
       setQueue(updatedQueue.filter(p => p.status !== 'completed'));
       setActiveConsultation(null);
-      localStorage.setItem('patientQueue', JSON.stringify(updatedQueue));
+      localStorage.setItem('doctorQueue', JSON.stringify(updatedQueue));
+      localStorage.removeItem('currentPatient');
       broadcastUpdate();
       showSuccess(`Consultation with ${activeConsultation.name} completed`);
     }

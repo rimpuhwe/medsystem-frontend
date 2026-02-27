@@ -376,6 +376,15 @@ export default function InventoryPage() {
   const [showAddStockId, setShowAddStockId] = useState<number | null>(null);
   const [addStockValue, setAddStockValue] = useState(0);
 
+  useEffect(() => {
+    const stored = localStorage.getItem('inventory')
+    if (stored) {
+      setInventory(JSON.parse(stored))
+    } else {
+      localStorage.setItem('inventory', JSON.stringify(initialInventory))
+    }
+  }, [])
+
   // Notification logic
   useEffect(() => {
     const now = new Date();
@@ -396,15 +405,20 @@ export default function InventoryPage() {
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     const id = inventory.length ? inventory[inventory.length - 1].id + 1 : 1;
-    setInventory([
+    const updated = [
       ...inventory,
       { id, ...newMed, stock: Number(newMed.stock) },
-    ]);
+    ]
+    setInventory(updated);
+    localStorage.setItem('inventory', JSON.stringify(updated))
     setNewMed({ name: "", category: "", batch: "", expiry: "", stock: "" });
   };
 
-  const handleDelete = (id: number) =>
-    setInventory(inventory.filter((m) => m.id !== id));
+  const handleDelete = (id: number) => {
+    const updated = inventory.filter((m) => m.id !== id)
+    setInventory(updated)
+    localStorage.setItem('inventory', JSON.stringify(updated))
+  }
 
   const handleEdit = (med: any) => {
     setEditId(med.id);
@@ -412,22 +426,22 @@ export default function InventoryPage() {
   };
 
   const handleEditSave = () => {
-    setInventory(
-      inventory.map((m) =>
-        m.id === editId ? { ...editMed, stock: Number(editMed.stock) } : m,
-      ),
-    );
+    const updated = inventory.map((m) =>
+      m.id === editId ? { ...editMed, stock: Number(editMed.stock) } : m,
+    )
+    setInventory(updated);
+    localStorage.setItem('inventory', JSON.stringify(updated))
     setEditId(null);
     setEditMed(null);
   };
 
   const handleAddStock = (id: number) => {
     if (addStockValue <= 0) return;
-    setInventory(
-      inventory.map((m) =>
-        m.id === id ? { ...m, stock: m.stock + addStockValue } : m,
-      ),
-    );
+    const updated = inventory.map((m) =>
+      m.id === id ? { ...m, stock: m.stock + addStockValue } : m,
+    )
+    setInventory(updated);
+    localStorage.setItem('inventory', JSON.stringify(updated))
     setShowAddStockId(null);
     setAddStockValue(0);
   };

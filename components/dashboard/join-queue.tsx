@@ -6,36 +6,12 @@ import { Clock } from "lucide-react";
 export default function JoinQueue({ token }: { token: string }) {
   const [queueData, setQueueData] = useState<any>(null);
 
-  // Check if the patient is already in the queue
   useEffect(() => {
-    const fetchQueue = async () => {
-      try {
-        const res = await fetch(
-          "https://medsystemapplication.onrender.com/api/patient/queue/join",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (res.ok) {
-          const data = await res.json();
-          setQueueData(data);
-        } else {
-          setQueueData(null);
-        }
-      } catch (err) {
-        setQueueData(null);
-      }
-    };
-
-    fetchQueue();
-
-    // Optional: poll every 5 seconds for real-time updates
-    const interval = setInterval(fetchQueue, 5000);
-    return () => clearInterval(interval);
-  }, [token]);
+    const stored = localStorage.getItem('patientQueue')
+    if (stored) {
+      setQueueData(JSON.parse(stored))
+    }
+  }, [])
 
   if (!queueData) {
     return (
@@ -51,7 +27,7 @@ export default function JoinQueue({ token }: { token: string }) {
 
         <button
           onClick={() => (window.location.href = "/patient/Queue")}
-          className="w-full bg-blue-500 text-white py-3 rounded-md"
+          className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 transition-colors"
         >
           Join Queue Now
         </button>
@@ -64,25 +40,38 @@ export default function JoinQueue({ token }: { token: string }) {
       <h2 className="text-lg text-blue-500 mb-4">Queue Position</h2>
 
       <div className="text-5xl font-bold text-blue-600 mb-4">
-        {queueData.position}
+        #{queueData.queueNumber || queueData.position || 1}
       </div>
 
       <div className="text-sm text-gray-600 space-y-2">
         <p>
-          <strong>Status:</strong> {queueData.status}
+          <strong>Status:</strong> {queueData.status || 'Waiting'}
         </p>
         <p>
-          <strong>Clinic:</strong> {queueData.clinic.clinicName}
+          <strong>Position:</strong> {queueData.position || 1} in line
+        </p>
+        <p>
+          <strong>Clinic:</strong> {queueData.clinic}
         </p>
         <p>
           <strong>Service:</strong> {queueData.service}
         </p>
-        {queueData.doctorName && (
+        {queueData.doctor && (
           <p>
-            <strong>Doctor:</strong> {queueData.doctorName}
+            <strong>Doctor:</strong> {queueData.doctor}
           </p>
         )}
       </div>
+      
+      <button
+        onClick={() => {
+          localStorage.removeItem('patientQueue')
+          setQueueData(null)
+        }}
+        className="mt-4 w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition-colors text-sm"
+      >
+        Leave Queue
+      </button>
     </div>
   );
 }

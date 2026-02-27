@@ -44,20 +44,30 @@ export default function Header({ dashboardType }: HeaderProps) {
   };
 
   useEffect(() => {
-    const savedProfile = localStorage.getItem(config.profileKey);
+    const updateInitials = () => {
+      const savedProfile = localStorage.getItem(config.profileKey);
 
-    if (savedProfile) {
-      const profile = JSON.parse(savedProfile);
-      if (profile.fullName) {
-        const initials = profile.fullName
-          .split(" ")
-          .map((n: string) => n[0])
-          .join("")
-          .toUpperCase();
+      if (savedProfile) {
+        const profile = JSON.parse(savedProfile);
+        if (profile.fullName) {
+          const initials = profile.fullName
+            .split(" ")
+            .map((n: string) => n[0])
+            .join("")
+            .toUpperCase();
 
-        setUserInitials(initials);
+          setUserInitials(initials);
+        }
       }
-    }
+    };
+
+    updateInitials();
+
+    // Listen for storage changes
+    window.addEventListener('storage', updateInitials);
+    
+    // Custom event for same-tab updates
+    window.addEventListener('profileUpdated', updateInitials);
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -69,12 +79,16 @@ export default function Header({ dashboardType }: HeaderProps) {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener('storage', updateInitials);
+      window.removeEventListener('profileUpdated', updateInitials);
+    };
   }, [config.profileKey]);
 
   const handleSignOut = () => {
     localStorage.clear();
-    router.push("/login");
+    router.push("/my-account/login");
   };
 
   return (

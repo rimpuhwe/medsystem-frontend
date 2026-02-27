@@ -43,16 +43,35 @@ const LoginPage: React.FC = () => {
       const { Token, Role, Message } = data;
 
       // Store token, role, and referenceNumber
-      const token = localStorage.setItem("token", Token);
-      const role = localStorage.setItem("role", Role);
+      localStorage.setItem("token", Token);
+      localStorage.setItem("role", Role);
       if (Message) {
         localStorage.setItem("message", Message);
       }
-      // fetch("https://medsystemapplication.onrender.com/api/doctor/dashboard", {
-      //   headers: {
-      //     Authorization: `Bearer ${Token}`,
-      //   },
-      // });
+
+      // Fetch user profile based on role
+      if (Role === "DOCTOR" || Role === "PHARMACIST") {
+        try {
+          const endpoint = Role === "DOCTOR" ? "/api/doctor/profile" : "/api/pharmacist/profile";
+          const profileResponse = await fetch(
+            `https://medsystemapplication.onrender.com${endpoint}`,
+            {
+              headers: {
+                Authorization: `Bearer ${Token}`,
+              },
+            }
+          );
+          
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            const profileKey = Role === "DOCTOR" ? "doctorProfile" : "pharmacistProfile";
+            localStorage.setItem(profileKey, JSON.stringify(profileData));
+            window.dispatchEvent(new Event('profileUpdated'));
+          }
+        } catch (profileError) {
+          console.error("Failed to fetch profile:", profileError);
+        }
+      }
 
 
       // Redirect based on role
@@ -85,7 +104,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f2f4f8] px-4">
+    <div className="min-h-screen flex items-center justify-center shadow-xl bg-[#f2f4f8] px-4">
       <div className="relative w-full max-w-5xl h-[540px] bg-white rounded-md shadow-[0_20px_40px_rgba(0,0,0,0.15)] overflow-hidden flex">
         {/* Left Side */}
         <div className="hidden md:flex w-1/2 bg-[#f5f7fa] flex-col items-center justify-center z-10">

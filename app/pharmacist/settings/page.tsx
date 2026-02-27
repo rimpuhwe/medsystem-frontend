@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Shield,
   User,
@@ -17,6 +17,35 @@ export default function SettingsPage() {
   const [advancedMode, setAdvancedMode] = useState(false);
   const [autoBackup, setAutoBackup] = useState(true);
   const [dataRetention, setDataRetention] = useState(true);
+  const [profileData, setProfileData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    license: ''
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem('pharmacistProfile');
+    if (saved) {
+      setProfileData(JSON.parse(saved));
+    } else {
+      const defaultProfile = {
+        fullName: 'Sarah Johnson',
+        email: 'sarah.johnson@pharmacy.com',
+        phone: '+1 (555) 234-5678',
+        license: 'PH-87654321'
+      };
+      setProfileData(defaultProfile);
+      localStorage.setItem('pharmacistProfile', JSON.stringify({...defaultProfile, specialization: 'Clinical Pharmacy', bio: 'Licensed pharmacist with expertise in medication management and patient counseling.'}));
+    }
+  }, []);
+
+  const saveProfile = () => {
+    const saved = localStorage.getItem('pharmacistProfile');
+    const existing = saved ? JSON.parse(saved) : {};
+    localStorage.setItem('pharmacistProfile', JSON.stringify({...existing, ...profileData}));
+    alert('Profile saved successfully!');
+  };
 
   return (
     <div className="min-h-screen bg-[#f6f8fb] pb-28">
@@ -28,11 +57,12 @@ export default function SettingsPage() {
           title="Pharmacist Information"
         >
           <div className="grid md:grid-cols-2 gap-5">
-            <FormField label="Full Name" value="Dr. Marie Uwimana" />
-            <FormField label="License Number" value="MD-RW-2019-0789" />
-            <FormField label="Phone Number" value="+250 788 987 6543" />
-            <FormField label="Email Address" value="marie.uwimana@pharmacare.rw" />
+            <FormField label="Full Name" value={profileData.fullName} onChange={(v) => setProfileData({...profileData, fullName: v})} />
+            <FormField label="License Number" value={profileData.license} onChange={(v) => setProfileData({...profileData, license: v})} />
+            <FormField label="Phone Number" value={profileData.phone} onChange={(v) => setProfileData({...profileData, phone: v})} />
+            <FormField label="Email Address" value={profileData.email} onChange={(v) => setProfileData({...profileData, email: v})} />
           </div>
+          <button onClick={saveProfile} className="mt-4 px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm">Save Profile</button>
         </SectionCard>
 
         {/* ================= Security Settings ================= */}
@@ -175,9 +205,11 @@ function SectionCard({
 function FormField({
   label,
   value,
+  onChange,
 }: {
   label: string;
   value: string;
+  onChange?: (value: string) => void;
 }) {
   return (
     <div>
@@ -185,7 +217,8 @@ function FormField({
         {label}
       </label>
       <input
-        defaultValue={value}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
       />
     </div>
