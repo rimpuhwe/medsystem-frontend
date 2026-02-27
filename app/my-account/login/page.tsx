@@ -36,6 +36,28 @@ const LoginPage: React.FC = () => {
       );
 
       if (!response.ok) {
+        // Check localStorage for admin-added doctors
+        const doctors = JSON.parse(localStorage.getItem('doctors') || '[]');
+        const doctor = doctors.find((d: any) => d.email === email && d.password === password);
+        
+        if (doctor) {
+          // Create mock token and store doctor profile
+          const mockToken = 'local_' + btoa(email);
+          localStorage.setItem("token", mockToken);
+          localStorage.setItem("role", "DOCTOR");
+          localStorage.setItem('doctorProfile', JSON.stringify({
+            fullName: doctor.name,
+            email: doctor.email,
+            phone: doctor.phone,
+            license: 'MD-' + Date.now(),
+            specialization: doctor.specialty,
+            bio: `${doctor.specialty} specialist at ${doctor.clinic}`
+          }));
+          window.dispatchEvent(new Event('profileUpdated'));
+          router.push("/doctor/dashboard");
+          return;
+        }
+        
         throw new Error("Invalid credentials");
       }
 
@@ -75,7 +97,7 @@ const LoginPage: React.FC = () => {
 
 
       // Redirect based on role
-      switch (Role) {
+      switch (Role || "DOCTOR") {
         case "ADMIN":
           router.push("/admin/dashboard");
           break;
