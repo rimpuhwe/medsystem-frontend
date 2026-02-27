@@ -29,7 +29,8 @@ export default function RequestMedicalRecords() {
     try {
       const code = generateCode()
       setGeneratedCode(code)
-      console.log('DEMO MODE - Verification Code:', code)
+      console.log('🔐 VERIFICATION CODE:', code)
+      console.log('📧 Email:', email)
       
       await new Promise((resolve) => setTimeout(resolve, 1000))
       setSubmitted(true)
@@ -47,7 +48,7 @@ export default function RequestMedicalRecords() {
     
     if (verificationCode === generatedCode) {
       await new Promise((resolve) => setTimeout(resolve, 500))
-      router.push("/patientDashboard/dashboard/report-ready")
+      router.push("/patient/report-ready")
       setIsLoading(false)
     } else {
       setError("Invalid verification code. Please try again.")
@@ -67,16 +68,11 @@ export default function RequestMedicalRecords() {
             <div>
               <h1 className="text-2xl font-semibold text-gray-800">Verification Code Sent</h1>
               <p className="text-sm text-gray-600 mt-2">
-                We've sent a verification code to <strong>{email}</strong>
+                We've sent a 6-digit verification code to <strong>{email}</strong>
               </p>
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-              <p className="text-sm font-semibold text-yellow-800 mb-2">📧 Demo Mode</p>
-              <p className="text-sm text-yellow-700 mb-2">
-                No email sent. Use this code to verify:
+              <p className="text-xs text-gray-500 mt-2">
+                Please check your email inbox and enter the code below.
               </p>
-              <p className="text-center text-2xl font-bold text-yellow-900">{generatedCode}</p>
             </div>
 
             {error && (

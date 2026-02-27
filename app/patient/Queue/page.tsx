@@ -1,80 +1,47 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-const clinics = ["Kigali Hospital", "Butare Medical Center", "Gisenyi Clinic"];
-const departments = ["General Medicine", "Pediatrics", "Cardiology"];
 
 export default function QueuePage() {
   const router = useRouter();
-// JWT from login
 
   const [step, setStep] = useState(1);
   const [token, setToken] = useState<string | null>();
   const [clinic, setClinic] = useState("");
   const [department, setDepartment] = useState("");
   const [doctor, setDoctor] = useState("");
-  const [queueCount, setQueueCount] = useState<number | null>(null);
-  const [availableDoctors, setAvailableDoctors] = useState<string[]>([]);
+  const [clinics, setClinics] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [availableServices, setAvailableServices] = useState<string[]>([]);
+  const [filteredDoctors, setFilteredDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Step 1: Fetch queue summary
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     setToken(storedToken);
+    
+    const storedClinics = JSON.parse(localStorage.getItem('clinics') || '[]');
+    const storedDoctors = JSON.parse(localStorage.getItem('doctors') || '[]');
+    setClinics(storedClinics);
+    setDoctors(storedDoctors);
   }, []);
-  const fetchQueueSummary = async () => {
-    if (!clinic || !department) return;
-
-    try {
-      const res = await fetch(
-        `https://medsystemapplication.onrender.com/api/patient/queue/?clinicName=${encodeURIComponent(
-          clinic
-        )}&service=${encodeURIComponent(department)}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to fetch queue summary");
-
-      const data = await res.json();
-
-      // Assuming data has doctors array and total count
-      const count =
-        data.queueCount ||
-        (data.queueManagementByService &&
-          Object.values(data.queueManagementByService)
-            .flat()
-            .length) ||
-        0;
-
-      setQueueCount(count);
-
-      // Extract doctor names if available
-      const doctorsList =
-        data.doctors?.map((d: any) => d.fullName) ||
-        data.clinic?.doctors?.map((d: any) => d.fullName) ||
-        [];
-
-      setAvailableDoctors(doctorsList);
-      setError("");
-    } catch (err) {
-      console.error(err);
-      setError("Could not fetch queue info. Please try again.");
-      setQueueCount(null);
-    }
-  };
 
   useEffect(() => {
-    if (step === 1) fetchQueueSummary();
-  }, [clinic, department]);
+    if (clinic) {
+      const selectedClinic = clinics.find(c => c.name === clinic);
+      setAvailableServices(selectedClinic?.services || []);
+      setDepartment("");
+    }
+  }, [clinic, clinics]);
+
+  useEffect(() => {
+    if (clinic && department) {
+      const filtered = doctors.filter(d => d.clinic === clinic && d.specialty === department);
+      setFilteredDoctors(filtered);
+    }
+  }, [clinic, department, doctors]);
 
   // Step 1 continue
   const handleContinue = (e: React.FormEvent) => {
@@ -87,31 +54,45 @@ export default function QueuePage() {
   const handleJoin = async () => {
     setLoading(true);
     try {
-      const body = {
-        clinicName: clinic,
+      // Get existing doctor queue
+      const doctorQueue = JSON.parse(localStorage.getItem('doctorQueue') || '[]');
+      
+      // Filter queue by same clinic and doctor (or service if no specific doctor)
+      const sameClinicDoctorQueue = doctorQueue.filter((p: any) => 
+        p.clinic === clinic && 
+        (doctor ? p.doctor === doctor : p.reason === department)
+      );
+      
+      // Calculate queue number based on same clinic/doctor queue
+      const queueNumber = sameClinicDoctorQueue.length + 1;
+      const position = sameClinicDoctorQueue.filter((p: any) => p.status === 'waiting').length + 1;
+      
+      const queueData = {
+        clinic,
         service: department,
-        doctorName: doctor || undefined,
+        doctor: doctor || 'Any available',
+        position,
+        queueNumber,
+        status: 'Waiting',
+        joinedAt: new Date().toISOString()
       };
 
-      const res = await fetch(
-        "https://medsystemapplication.onrender.com/api/patient/queue/join",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(body),
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to join queue");
-
-      const data = await res.json();
-
-      // Save active queue locally
-      localStorage.setItem("activeQueue", JSON.stringify(data));
-
+      localStorage.setItem('patientQueue', JSON.stringify(queueData));
+      
+      // Add to doctor's queue
+      const newPatient = {
+        id: Date.now().toString(),
+        name: 'Patient ' + queueNumber,
+        queueNumber,
+        clinic,
+        doctor: doctor || 'Any available',
+        appointmentTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        reason: department,
+        status: 'waiting' as const
+      };
+      doctorQueue.push(newPatient);
+      localStorage.setItem('doctorQueue', JSON.stringify(doctorQueue));
+      
       router.push("/patient/dashboard");
     } catch (err) {
       console.error(err);
@@ -140,7 +121,7 @@ export default function QueuePage() {
             >
               <option value="">Select Clinic</option>
               {clinics.map((c) => (
-                <option key={c}>{c}</option>
+                <option key={c.id} value={c.name}>{c.name}</option>
               ))}
             </select>
 
@@ -148,19 +129,20 @@ export default function QueuePage() {
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               required
-              className="w-full p-3 border rounded-md"
+              disabled={!clinic}
+              className="w-full p-3 border rounded-md disabled:bg-gray-100"
             >
-              <option value="">Select Department</option>
-              {departments.map((d) => (
-                <option key={d}>{d}</option>
+              <option value="">Select Service</option>
+              {availableServices.map((d) => (
+                <option key={d} value={d}>{d}</option>
               ))}
             </select>
 
-            {queueCount !== null && (
-              <p className="text-green-600 text-sm">
-                {queueCount === 0
-                  ? "No one is in this queue at the moment."
-                  : `There are ${queueCount} patient(s) in this queue.`}
+            {clinic && department && (
+              <p className="text-blue-600 text-sm">
+                {filteredDoctors.length === 0
+                  ? "No doctors available for this service."
+                  : `${filteredDoctors.length} doctor(s) available for this service.`}
               </p>
             )}
 
@@ -181,8 +163,8 @@ export default function QueuePage() {
               className="w-full p-3 border rounded-md"
             >
               <option value="">Select Doctor (Optional)</option>
-              {availableDoctors.map((d) => (
-                <option key={d}>{d}</option>
+              {filteredDoctors.map((d) => (
+                <option key={d.id} value={d.name}>{d.name} - {d.specialty}</option>
               ))}
             </select>
 

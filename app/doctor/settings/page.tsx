@@ -89,14 +89,16 @@ function SettingsPage() {
     }
     
     if (!savedProfile) {
-      setProfileData({
+      const defaultProfile = {
         fullName: 'Dr. John Smith',
         email: 'john.smith@hospital.com',
         phone: '+1 (555) 123-4567',
         license: 'MD-12345678',
         specialization: 'Internal Medicine',
-        bio: ''
-      });
+        bio: 'Experienced physician with over 10 years in internal medicine.'
+      };
+      setProfileData(defaultProfile);
+      localStorage.setItem('doctorProfile', JSON.stringify(defaultProfile));
     }
     
     if (savedClinic) {

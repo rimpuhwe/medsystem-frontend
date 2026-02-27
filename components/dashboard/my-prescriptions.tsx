@@ -35,10 +35,22 @@ const defaultPrescriptions: Prescription[] = [
   },
 ]
 
-export default function MyPrescriptions({ prescriptions = defaultPrescriptions }: MyPrescriptionsProps = {}) {
+export default function MyPrescriptions({ prescriptions: propPrescriptions }: MyPrescriptionsProps = {}) {
+  const [prescriptions, setPrescriptions] = useState<Prescription[]>(propPrescriptions || defaultPrescriptions)
   const [activeNotifications, setActiveNotifications] = useState<Array<{id: string, prescription: Prescription, expiresAt: number}>>([])
   const [timeRemaining, setTimeRemaining] = useState<{[key: string]: string}>({})
   const notifiedIdsRef = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    const stored = localStorage.getItem('patientPrescriptions')
+    if (stored) {
+      const parsedPrescriptions = JSON.parse(stored).map((p: any) => ({
+        ...p,
+        signedAt: new Date(p.signedAt)
+      }))
+      setPrescriptions(parsedPrescriptions)
+    }
+  }, [])
 
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {

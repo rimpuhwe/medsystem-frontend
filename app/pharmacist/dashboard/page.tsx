@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   TrendingUp,
@@ -22,18 +22,26 @@ import {
   Cell,
 } from "recharts";
 
-/* ================= CATEGORY COLORS ================= */
-/* Purple - Antibiotics | Blue - Painkillers | Green - Vitamins | Amber - Others */
 const COLORS = ["#8b5cf6", "#3b82f6", "#16a34a", "#f59e0b"];
 
 export default function PharmacistDashboard() {
   const router = useRouter();
+  const [inventory, setInventory] = useState<any[]>([]);
+  const [lowStockCount, setLowStockCount] = useState(0);
+  const [totalMedicines, setTotalMedicines] = useState(0);
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('inventory') || '[]');
+    setInventory(stored);
+    setTotalMedicines(stored.length);
+    setLowStockCount(stored.filter((item: any) => item.stock <= 10).length);
+  }, []);
 
   /* ================= KPI DATA ================= */
   const kpis = [
     { title: "Today's Revenue", value: "$1,250", icon: TrendingUp, color: "text-blue-600" },
-    { title: "Total Medicines", value: "320", icon: Package, color: "text-emerald-600" },
-    { title: "Low Stock Items", value: "8", icon: AlertTriangle, color: "text-amber-600" },
+    { title: "Total Medicines", value: totalMedicines.toString(), icon: Package, color: "text-emerald-600" },
+    { title: "Low Stock Items", value: lowStockCount.toString(), icon: AlertTriangle, color: "text-amber-600" },
     { title: "Pending Dispenses", value: "5", icon: ClipboardList, color: "text-purple-600" },
   ];
 

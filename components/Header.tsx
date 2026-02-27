@@ -74,7 +74,7 @@ export default function Header({ dashboardType }: HeaderProps) {
 
   const handleSignOut = () => {
     localStorage.clear();
-    router.push("/login");
+    router.push("/my-account/login");
   };
 
   return (

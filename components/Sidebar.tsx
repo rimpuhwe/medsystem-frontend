@@ -11,6 +11,7 @@ import {
   Clock,
   Stethoscope,
   Pill,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -123,6 +124,13 @@ export default function Sidebar({ dashboardType }: SidebarProps) {
   const currentMenu = menuItems[dashboardType];
   const LogoIcon = config.logoIcon;
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('role')
+    localStorage.removeItem('user')
+    router.push('/my-account/login')
+  }
+
   return (
     <>
       <button
@@ -189,6 +197,16 @@ export default function Sidebar({ dashboardType }: SidebarProps) {
             );
           })}
         </nav>
+
+        <div className="absolute bottom-6 left-6 right-6">
+          <button
+            onClick={handleLogout}
+            className={`w-full text-sm flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 ${config.hoverBg} hover:text-white`}
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
+        </div>
       </div>
     </>
   );
