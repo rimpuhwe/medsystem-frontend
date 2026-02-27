@@ -2,28 +2,49 @@
 
 import Link from "next/link"
 import { Download, FileText, ArrowLeft } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export default function ReportReady() {
+  const [patientData, setPatientData] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          const response = await fetch('https://medsystemapplication.onrender.com/api/patient', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          if (response.ok) {
+            const data = await response.json()
+            setPatientData(data)
+          }
+        } catch (error) {
+          console.error('Failed to fetch patient data:', error)
+        }
+      }
+    }
+    fetchPatientData()
+  }, [])
+
   const handleDownloadPDF = () => {
-   
     const recordData = `
 MEDICAL RECORD
 
-Patient Name: <name>
-Reference ID: <reference_id>
-Date of Birth: <date_of_birth>
-Insurance: <insurance_provider>
+Patient Name: ${patientData?.fullName || 'N/A'}
+Reference ID: ${patientData?.referenceNumber || 'N/A'}
+Date of Birth: ${patientData?.dateOfBirth || 'N/A'}
+Insurance: ${patientData?.insurance || 'N/A'}
+Email: ${patientData?.email || 'N/A'}
+Phone: ${patientData?.phone || 'N/A'}
 
 MEDICAL INFORMATION
 
 Chronic Diseases:
-- Type 2 Diabetes (Moderate) - Well controlled
-- Hypertension (Mild) - Well controlled
+${patientData?.chronicDiseases?.map((d: any) => `- ${d}`).join('\n') || '- None'}
 
 Allergies:
-- Penicillin - Skin rash
-- Shellfish - Breathing difficulties
-- Naproxen - Asthma flare
+${patientData?.allergies?.map((a: any) => `- ${a}`).join('\n') || '- None'}
 
 Generated on: ${new Date().toLocaleString()}
     `
