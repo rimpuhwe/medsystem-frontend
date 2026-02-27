@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Eye,
   Download,
@@ -15,33 +15,12 @@ export default function DispensedRecordsPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [providerFilter, setProviderFilter] = useState("All Providers");
   const [viewModal, setViewModal] = useState<any>(null);
+  const [allRecords, setAllRecords] = useState<any[]>([]);
 
-  const allRecords = [
-    {
-      id: "RX-2024-001547",
-      patient: "Jean Baptiste Nkurunziza",
-      insurance: "RSSB",
-      coverage: "85%",
-      providerPolicy: "RSSB-2024-7891234",
-      digitalRef: "DO-RW-2024-001547",
-      date: "2024-01-15",
-      time: "14:30",
-      total: "5,000",
-      pharmacist: "Grace Uwimana",
-    },
-    {
-      id: "RX-2024-001548",
-      patient: "Marie Claire Uwizeyimana",
-      insurance: "MMI",
-      coverage: "90%",
-      providerPolicy: "MMI-2024-5567890",
-      digitalRef: "DO-RW-2024-001548",
-      date: "2024-01-15",
-      time: "15:45",
-      total: "8,500",
-      pharmacist: "Grace Uwimana",
-    },
-  ];
+  useEffect(() => {
+    const dispensed = JSON.parse(localStorage.getItem('dispensedPrescriptions') || '[]');
+    setAllRecords(dispensed);
+  }, []);
 
   const records = allRecords.filter(r => {
     const matchSearch = search === '' || r.patient.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase());
@@ -170,7 +149,7 @@ export default function DispensedRecordsPage() {
                 {record.digitalRef}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                2 medicines prescribed
+                {record.medicines?.length || 0} medicines dispensed
               </p>
             </div>
 
@@ -224,15 +203,30 @@ export default function DispensedRecordsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div><span className="text-gray-500 text-sm">Reference ID:</span><p className="font-medium">{viewModal.id}</p></div>
                 <div><span className="text-gray-500 text-sm">Patient:</span><p className="font-medium">{viewModal.patient}</p></div>
-                <div><span className="text-gray-500 text-sm">Insurance:</span><p className="font-medium">{viewModal.insurance}</p></div>
-                <div><span className="text-gray-500 text-sm">Coverage:</span><p className="font-medium">{viewModal.coverage}</p></div>
-                <div><span className="text-gray-500 text-sm">Policy Number:</span><p className="font-medium">{viewModal.providerPolicy}</p></div>
-                <div><span className="text-gray-500 text-sm">Digital Ref:</span><p className="font-medium">{viewModal.digitalRef}</p></div>
+                <div><span className="text-gray-500 text-sm">Doctor:</span><p className="font-medium">{viewModal.doctorName || 'N/A'}</p></div>
+                <div><span className="text-gray-500 text-sm">Diagnosis:</span><p className="font-medium">{viewModal.diagnosis || 'N/A'}</p></div>
                 <div><span className="text-gray-500 text-sm">Date:</span><p className="font-medium">{viewModal.date}</p></div>
                 <div><span className="text-gray-500 text-sm">Time:</span><p className="font-medium">{viewModal.time}</p></div>
-                <div><span className="text-gray-500 text-sm">Total:</span><p className="font-medium">RWF {viewModal.total}</p></div>
                 <div><span className="text-gray-500 text-sm">Pharmacist:</span><p className="font-medium">{viewModal.pharmacist}</p></div>
               </div>
+              
+              {viewModal.medicines && viewModal.medicines.length > 0 && (
+                <div className="mt-4">
+                  <span className="text-gray-500 text-sm font-semibold">Medicines Dispensed:</span>
+                  <div className="mt-2 space-y-2">
+                    {viewModal.medicines.map((med: any, idx: number) => (
+                      <div key={idx} className="bg-gray-50 p-3 rounded border border-gray-200">
+                        <p className="font-medium">{med.medicineName || med.name}</p>
+                        <p className="text-sm text-gray-600">Dosage: {med.dosage}</p>
+                        <p className="text-sm text-gray-600">Frequency: {med.frequency}</p>
+                        <p className="text-sm text-gray-600">Duration: {med.duration}</p>
+                        {med.instructions && <p className="text-sm text-gray-600">Instructions: {med.instructions}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="flex gap-2 mt-6">
                 <button onClick={() => handleDownload(viewModal)} className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2">
                   <Download size={16} /> Download Receipt
@@ -247,21 +241,32 @@ export default function DispensedRecordsPage() {
   );
 
   function handleDownload(record: any) {
+    const medicinesText = record.medicines && record.medicines.length > 0
+      ? record.medicines.map((med: any, idx: number) => `
+  ${idx + 1}. ${med.medicineName || med.name}
+     - Dosage: ${med.dosage}
+     - Frequency: ${med.frequency}
+     - Duration: ${med.duration}
+     ${med.instructions ? `- Instructions: ${med.instructions}` : ''}`).join('\n')
+      : '  No medicines listed';
+
     const content = `
 DIGITAL MEDICAL ORDINANCE SYSTEM
 Dispensed Prescription Receipt
 ${'='.repeat(50)}
 
 Reference ID: ${record.id}
-Patient: ${record.patient}
-Insurance: ${record.insurance} (${record.coverage} coverage)
-Policy: ${record.providerPolicy}
-Digital Ref: ${record.digitalRef}
+Patient Name: ${record.patient}
+Doctor: ${record.doctorName || 'N/A'}
+Diagnosis: ${record.diagnosis || 'N/A'}
 
-Date: ${record.date}
-Time: ${record.time}
-Total: RWF ${record.total}
-Pharmacist: ${record.pharmacist}
+Medicines Dispensed:${medicinesText}
+
+Dispensing Details:
+- Date: ${record.date}
+- Time: ${record.time}
+- Dispensed At: ${record.dispensedAt ? new Date(record.dispensedAt).toLocaleString() : 'N/A'}
+- Pharmacist: ${record.pharmacist}
 
 Status: Completed
 ${'='.repeat(50)}

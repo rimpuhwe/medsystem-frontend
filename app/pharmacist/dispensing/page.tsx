@@ -75,13 +75,15 @@ export default function ScanPrescriptionPage() {
       setPrescription(null);
 
       const prescriptions = JSON.parse(localStorage.getItem('prescriptions') || '[]');
-      const found = prescriptions.find((p: any) => p.id === id || p.referenceId === id);
+      const found = prescriptions.find((p: any) => 
+        (p.id === id || p.referenceId === id) && p.status === 'active'
+      );
 
       if (found) {
         setPrescription(found);
         setMessage("Prescription retrieved successfully ✅");
       } else {
-        setMessage("Prescription not found ❌");
+        setMessage("Active prescription not found ❌");
       }
     } catch {
       setMessage("Failed to retrieve prescription ❌");
@@ -150,26 +152,95 @@ export default function ScanPrescriptionPage() {
               <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-2">Prescription Details</h3>
                 <div className="space-y-1 text-sm">
+                  <p><strong>Prescription ID:</strong> {prescription.id || prescription.referenceId}</p>
                   <p><strong>Patient:</strong> {prescription.patientName}</p>
-                  <p><strong>Doctor:</strong> {prescription.doctorName}</p>
-                  <p><strong>Medicine:</strong> {prescription.medicineName}</p>
-                  <p><strong>Dosage:</strong> {prescription.dosage}</p>
-                  <p><strong>Frequency:</strong> {prescription.frequency}</p>
-                  <p><strong>Duration:</strong> {prescription.duration}</p>
-                  {prescription.instructions && <p><strong>Instructions:</strong> {prescription.instructions}</p>}
+                  <p><strong>Doctor:</strong> {prescription.doctorName || 'N/A'}</p>
+                  <p><strong>Diagnosis:</strong> {prescription.diagnosis}</p>
+                  <p><strong>Date:</strong> {new Date(prescription.date).toLocaleDateString()}</p>
+                  
+                  <div className="mt-3">
+                    <strong>Medicines:</strong>
+                    <div className="ml-4 mt-2 space-y-2">
+                      {prescription.medicines && prescription.medicines.length > 0 ? (
+                        prescription.medicines.map((med: any, idx: number) => (
+                          <div key={idx} className="bg-white p-2 rounded border border-gray-200">
+                            <p><strong>Name:</strong> {med.medicineName || med.name}</p>
+                            <p><strong>Dosage:</strong> {med.dosage}</p>
+                            <p><strong>Frequency:</strong> {med.frequency}</p>
+                            <p><strong>Duration:</strong> {med.duration}</p>
+                            {med.instructions && <p><strong>Instructions:</strong> {med.instructions}</p>}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-600">No medicines listed</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <button
                   onClick={() => {
+                    // Deduct from inventory for each medicine
+                    const inventory = JSON.parse(localStorage.getItem('inventory') || '[]');
+                    const pharmacistProfile = JSON.parse(localStorage.getItem('pharmacistProfile') || '{}');
+                    const pharmacistName = pharmacistProfile.fullName || 'Unknown Pharmacist';
+                    let allAvailable = true;
+                    
+                    prescription.medicines.forEach((med: any) => {
+                      const medicineName = med.medicineName || med.name;
+                      const medicineIndex = inventory.findIndex((item: any) => 
+                        item.name.toLowerCase() === medicineName.toLowerCase()
+                      );
+                      
+                      if (medicineIndex !== -1) {
+                        const quantityNeeded = parseInt(med.duration?.split('-')[0]) || 1;
+                        if (inventory[medicineIndex].stock >= quantityNeeded) {
+                          inventory[medicineIndex].stock -= quantityNeeded;
+                        } else {
+                          allAvailable = false;
+                          setMessage(`Insufficient stock for ${medicineName} ⚠️`);
+                        }
+                      }
+                    });
+                    
+                    if (!allAvailable) return;
+                    
+                    localStorage.setItem('inventory', JSON.stringify(inventory));
+                    
+                    // Add to dispensed records with all details
                     const dispensed = JSON.parse(localStorage.getItem('dispensedPrescriptions') || '[]');
-                    dispensed.push({ ...prescription, dispensedAt: new Date().toISOString() });
+                    const dispensedRecord = {
+                      id: prescription.id || prescription.referenceId,
+                      patient: prescription.patientName,
+                      insurance: 'N/A',
+                      coverage: 'N/A',
+                      providerPolicy: 'N/A',
+                      digitalRef: prescription.id || prescription.referenceId,
+                      date: new Date().toISOString().split('T')[0],
+                      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                      total: '0',
+                      pharmacist: pharmacistName,
+                      doctorName: prescription.doctorName,
+                      diagnosis: prescription.diagnosis,
+                      medicines: prescription.medicines,
+                      dispensedAt: new Date().toISOString()
+                    };
+                    dispensed.push(dispensedRecord);
                     localStorage.setItem('dispensedPrescriptions', JSON.stringify(dispensed));
+                    
+                    // Mark prescription as dispensed
+                    const prescriptions = JSON.parse(localStorage.getItem('prescriptions') || '[]');
+                    const updatedPrescriptions = prescriptions.map((p: any) => 
+                      p.id === prescription.id ? { ...p, status: 'dispensed' } : p
+                    );
+                    localStorage.setItem('prescriptions', JSON.stringify(updatedPrescriptions));
+                    
                     setMessage("Prescription dispensed successfully ✅");
                     setPrescription(null);
                     setManualId("");
                   }}
                   className="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm transition"
                 >
-                  Dispense Medicine
+                  Dispense All Medicines
                 </button>
               </div>
             )}

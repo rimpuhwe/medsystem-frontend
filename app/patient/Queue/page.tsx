@@ -140,9 +140,7 @@ export default function QueuePage() {
 
             {clinic && department && (
               <p className="text-blue-600 text-sm">
-                {filteredDoctors.length === 0
-                  ? "No doctors available for this service."
-                  : `${filteredDoctors.length} doctor(s) available for this service.`}
+                {filteredDoctors.length} doctor(s) available for this service.
               </p>
             )}
 

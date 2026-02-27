@@ -25,15 +25,44 @@ function AddPatient() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    try {
+      // Try API first
+      const token = localStorage.getItem('token');
+      if (token && !token.startsWith('local_')) {
+        const response = await fetch('https://medsystemapplication.onrender.com/api/doctor/patients', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          showSuccess(`Patient ${formData.fullName} saved successfully!`);
+          setFormData({
+            fullName: '', dateOfBirth: '', phoneNumber: '', emergencyPhone: '',
+            gender: '', insuranceProvider: '', insuranceNumber: '', insuranceHolder: '', holderEmployer: '', email: ''
+          });
+          return;
+        }
+      }
+    } catch (error) {
+      console.log('API failed, using localStorage');
+    }
+    
+    // Fallback to localStorage
     const patientId = `PAT-${Date.now().toString().slice(-6)}`;
     const patientData = {
       id: patientId,
       name: formData.fullName,
       gender: formData.gender,
       phone: formData.phoneNumber,
-      email: `${formData.fullName.toLowerCase().replace(' ', '.')}@email.com`,
+      email: formData.email || `${formData.fullName.toLowerCase().replace(' ', '.')}@email.com`,
       lastVisit: new Date().toLocaleDateString(),
       prescriptions: 0
     };

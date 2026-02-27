@@ -137,24 +137,51 @@ function CreatePrescription({}: CreatePrescriptionProps) {
           ? localStorage.getItem("token") || ""
           : "";
 
-      const response = await apiRequest(
-        `https://medsystemapplication.onrender.com/api/patient?patientReferenceNumber=${encodeURIComponent(
-          patientId.trim()
-        )}`,
-        token
-      );
+      // Try API first if not local token
+      if (token && !token.startsWith('local_')) {
+        const response = await apiRequest(
+          `https://medsystemapplication.onrender.com/api/patient?patientReferenceNumber=${encodeURIComponent(
+            patientId.trim()
+          )}`,
+          token
+        );
 
-      const patient = await response.json();
-      setFoundPatient(patient);
-      showSuccess(`Patient ${patient.fullName ?? patient.name ?? ""} found!`);
+        const patient = await response.json();
+        setFoundPatient(patient);
+        showSuccess(`Patient ${patient.fullName ?? patient.name ?? ""} found!`);
+        return;
+      }
+    } catch (error: any) {
+      console.log('API failed, checking localStorage');
+    }
+
+    // Fallback to localStorage
+    try {
+      const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+      const patient = patients.find((p: any) => 
+        p.id === patientId.trim() || p.referenceNumber === patientId.trim()
+      );
+      
+      if (patient) {
+        setFoundPatient({
+          name: patient.name || patient.fullName,
+          id: patient.id,
+          ReferenceNumber: patient.id,
+          gender: patient.gender,
+          phoneNumber: patient.phone,
+          insuranceProvider: patient.insuranceProvider || 'N/A',
+          allergies: patient.allergies || [],
+          chronicDiseases: patient.chronicDiseases || []
+        });
+        showSuccess(`Patient ${patient.name || patient.fullName} found!`);
+      } else {
+        setFoundPatient(null);
+        showError(`Patient with reference number "${patientId}" not found.`);
+      }
     } catch (error: any) {
       console.error("Failed to fetch patient:", error);
       setFoundPatient(null);
-      const message =
-        error instanceof Error
-          ? error.message
-          : `Patient with reference number "${patientId}" not found.`;
-      showError(message);
+      showError(`Patient with reference number "${patientId}" not found.`);
     }
   };
 
@@ -166,47 +193,89 @@ function CreatePrescription({}: CreatePrescriptionProps) {
       return;
     }
 
-    try {
-      const payload = {
-        diagnosis,
-        medicines: medicines.map((m) => {
-          const base = `${m.name} - ${m.dosage}`;
-          const details = [m.frequency, m.duration]
-            .filter(Boolean)
-            .join(", ");
-          const withDetails = details ? `${base}, ${details}` : base;
-          return m.instructions
-            ? `${withDetails} (${m.instructions})`
-            : withDetails;
-        }),
-        chronicDiseases: splitToArray(formData.chronicDiseases),
-        allergies: splitToArray(formData.allergies),
-      };
+    const payload = {
+      diagnosis,
+      medicines: medicines.map((m) => {
+        const base = `${m.name} - ${m.dosage}`;
+        const details = [m.frequency, m.duration]
+          .filter(Boolean)
+          .join(", ");
+        const withDetails = details ? `${base}, ${details}` : base;
+        return m.instructions
+          ? `${withDetails} (${m.instructions})`
+          : withDetails;
+      }),
+      chronicDiseases: splitToArray(formData.chronicDiseases),
+      allergies: splitToArray(formData.allergies),
+    };
 
+    try {
       const token =
         typeof window !== "undefined"
           ? localStorage.getItem("token") || ""
           : "";
 
-      const response = await apiRequest(
-        `https://medsystemapplication.onrender.com/api/doctors/consultation?patientReferenceNumber=${encodeURIComponent(
-          patientId.trim()
-        )}`,
-        token,
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        }
-      );
+      // Try API first if not local token
+      if (token && !token.startsWith('local_')) {
+        const response = await apiRequest(
+          `https://medsystemapplication.onrender.com/api/doctors/consultation?patientReferenceNumber=${encodeURIComponent(
+            patientId.trim()
+          )}`,
+          token,
+          {
+            method: "POST",
+            body: JSON.stringify(payload),
+          }
+        );
 
-      const data = await response.json();
+        const data = await response.json();
 
+        showSuccess(
+          `Consultation ${
+            isDraft ? "saved as draft" : "created and sent"
+          } successfully${
+            (data as any)?.id ? ` with ID: ${(data as any).id}` : ""
+          }.`
+        );
+        setPatientId("");
+        setDiagnosis("");
+        setMedicines([]);
+        setFoundPatient(null);
+        setFormData({ chronicDiseases: "", allergies: "" });
+        return;
+      }
+    } catch (error) {
+      console.log('API failed, using localStorage');
+    }
+
+    // Fallback to localStorage
+    try {
+      const prescriptions = JSON.parse(localStorage.getItem('prescriptions') || '[]');
+      const doctorProfile = JSON.parse(localStorage.getItem('doctorProfile') || '{}');
+      const doctorName = doctorProfile.fullName || 'Unknown Doctor';
+      
+      const newPrescription = {
+        id: `RX-${Date.now()}`,
+        referenceId: `RX-${Date.now()}`,
+        patientId: foundPatient.ReferenceNumber ?? foundPatient.id,
+        patientName: foundPatient.fullName ?? foundPatient.name,
+        doctorName: doctorName,
+        diagnosis,
+        medicines: medicines.map(m => ({
+          medicineName: m.name,
+          dosage: m.dosage,
+          frequency: m.frequency,
+          duration: m.duration,
+          instructions: m.instructions
+        })),
+        date: new Date().toISOString(),
+        status: isDraft ? 'pending' : 'active'
+      };
+      prescriptions.push(newPrescription);
+      localStorage.setItem('prescriptions', JSON.stringify(prescriptions));
+      
       showSuccess(
-        `Consultation ${
-          isDraft ? "saved as draft" : "created and sent"
-        } successfully${
-          (data as any)?.id ? ` with ID: ${(data as any).id}` : ""
-        }.`
+        `Prescription ${isDraft ? "saved as draft" : "created"} successfully with ID: ${newPrescription.id}`
       );
       setPatientId("");
       setDiagnosis("");
@@ -214,11 +283,11 @@ function CreatePrescription({}: CreatePrescriptionProps) {
       setFoundPatient(null);
       setFormData({ chronicDiseases: "", allergies: "" });
     } catch (error) {
-      console.error("Failed to save consultation:", error);
+      console.error("Failed to save prescription:", error);
       const message =
         error instanceof Error
           ? error.message
-          : "Failed to save consultation. Please try again.";
+          : "Failed to save prescription. Please try again.";
       showError(message);
     }
   };

@@ -29,12 +29,15 @@ export default function PharmacistDashboard() {
   const [inventory, setInventory] = useState<any[]>([]);
   const [lowStockCount, setLowStockCount] = useState(0);
   const [totalMedicines, setTotalMedicines] = useState(0);
+  const [dispensedCount, setDispensedCount] = useState(0);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('inventory') || '[]');
+    const dispensed = JSON.parse(localStorage.getItem('dispensedPrescriptions') || '[]');
     setInventory(stored);
     setTotalMedicines(stored.length);
     setLowStockCount(stored.filter((item: any) => item.stock <= 10).length);
+    setDispensedCount(dispensed.length);
   }, []);
 
   /* ================= KPI DATA ================= */
@@ -42,7 +45,7 @@ export default function PharmacistDashboard() {
     { title: "Today's Revenue", value: "$1,250", icon: TrendingUp, color: "text-blue-600" },
     { title: "Total Medicines", value: totalMedicines.toString(), icon: Package, color: "text-emerald-600" },
     { title: "Low Stock Items", value: lowStockCount.toString(), icon: AlertTriangle, color: "text-amber-600" },
-    { title: "Pending Dispenses", value: "5", icon: ClipboardList, color: "text-purple-600" },
+    { title: "Dispensed Today", value: dispensedCount.toString(), icon: ClipboardList, color: "text-purple-600" },
   ];
 
   /* ================= REVENUE DATA ================= */
