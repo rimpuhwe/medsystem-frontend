@@ -27,10 +27,29 @@ export default function PatientQueue() {
 
   const loadQueue = () => {
     const savedQueue = localStorage.getItem('doctorQueue');
+    const doctorProfile = localStorage.getItem('doctorProfile');
+    
     if (savedQueue) {
       try {
         const queueData = JSON.parse(savedQueue);
-        const activeQueue = queueData.filter((p: QueuePatient) => p.status !== 'completed');
+        let filteredQueue = queueData;
+
+        // Filter by doctor's clinic and specialty if profile exists
+        if (doctorProfile) {
+          const profile = JSON.parse(doctorProfile);
+          const doctors = JSON.parse(localStorage.getItem('doctors') || '[]');
+          const doctorInfo = doctors.find((d: any) => d.email === profile.email);
+          
+          if (doctorInfo) {
+            filteredQueue = queueData.filter((p: QueuePatient) => {
+              const matchesClinic = p.clinic === doctorInfo.clinic;
+              const matchesDoctor = !p.doctor || p.doctor === doctorInfo.name || p.doctor === doctorInfo.specialty;
+              return matchesClinic && matchesDoctor;
+            });
+          }
+        }
+
+        const activeQueue = filteredQueue.filter((p: QueuePatient) => p.status !== 'completed');
         setQueue(activeQueue);
 
         const inConsultation = activeQueue.find((p: QueuePatient) => p.status === 'in-consultation');

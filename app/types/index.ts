@@ -27,6 +27,8 @@ export interface QueuePatient {
   reason: string;
   status: 'waiting' | 'in-consultation' | 'completed';
   queueNumber: number;
+  clinic?: string;
+  doctor?: string;
 }
 
 interface Medicine {

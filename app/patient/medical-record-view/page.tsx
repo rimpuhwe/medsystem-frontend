@@ -1,14 +1,36 @@
 "use client"
 
 import { Heart, AlertTriangle, User, Calendar } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export default function MedicalRecordView() {
+  const [patientData, setPatientData] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchPatientData = async () => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        try {
+          const response = await fetch('https://medsystemapplication.onrender.com/api/patient', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          if (response.ok) {
+            const data = await response.json()
+            setPatientData(data)
+          }
+        } catch (error) {
+          console.error('Failed to fetch patient data:', error)
+        }
+      }
+    }
+    fetchPatientData()
+  }, [])
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
         <div className="border-b border-gray-200 pb-6 mb-6">
           <h1 className="text-3xl font-bold text-blue-500 mb-2">Medical Record</h1>
-          <p className="text-gray-600">Generated on: January 15, 2024</p>
+          <p className="text-gray-600">Generated on: {new Date().toLocaleDateString()}</p>
         </div>
 
         <div className="space-y-6">
@@ -20,19 +42,27 @@ export default function MedicalRecordView() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-gray-600">Name:</p>
-                <p className="font-semibold">&lt;name&gt;</p>
+                <p className="font-semibold">{patientData?.fullName || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-gray-600">Reference ID:</p>
-                <p className="font-semibold">&lt;reference_id&gt;</p>
+                <p className="font-semibold">{patientData?.referenceNumber || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-gray-600">Date of Birth:</p>
-                <p className="font-semibold">&lt;date_of_birth&gt;</p>
+                <p className="font-semibold">{patientData?.dateOfBirth || 'N/A'}</p>
               </div>
               <div>
                 <p className="text-gray-600">Insurance:</p>
-                <p className="font-semibold">&lt;insurance_provider&gt;</p>
+                <p className="font-semibold">{patientData?.insurance || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Email:</p>
+                <p className="font-semibold">{patientData?.email || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-gray-600">Phone:</p>
+                <p className="font-semibold">{patientData?.phone || 'N/A'}</p>
               </div>
             </div>
           </div>
@@ -43,28 +73,15 @@ export default function MedicalRecordView() {
               Chronic Diseases
             </h2>
             <div className="space-y-3">
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-gray-800">Type 2 Diabetes</p>
-                    <p className="text-xs text-gray-600 mt-1">Well controlled</p>
+              {patientData?.chronicDiseases && patientData.chronicDiseases.length > 0 ? (
+                patientData.chronicDiseases.map((disease: string, index: number) => (
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p className="font-semibold text-gray-800">{disease}</p>
                   </div>
-                  <span className="bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-1 rounded-full">
-                    Moderate
-                  </span>
-                </div>
-              </div>
-              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-gray-800">Hypertension</p>
-                    <p className="text-xs text-gray-600 mt-1">Well controlled</p>
-                  </div>
-                  <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
-                    Mild
-                  </span>
-                </div>
-              </div>
+                ))
+              ) : (
+                <p className="text-gray-600">No chronic diseases recorded</p>
+              )}
             </div>
           </div>
 
@@ -74,48 +91,23 @@ export default function MedicalRecordView() {
               Allergies & Reactions
             </h2>
             <div className="space-y-3">
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                      Medicine
-                    </span>
-                    <div>
-                      <p className="font-semibold text-gray-800">Penicillin</p>
-                      <p className="text-xs text-gray-600">Skin rash</p>
+              {patientData?.allergies && patientData.allergies.length > 0 ? (
+                patientData.allergies.map((allergy: string, index: number) => (
+                  <div key={index} className="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                          Allergy
+                        </span>
+                        <p className="font-semibold text-gray-800">{allergy}</p>
+                      </div>
+                      <AlertTriangle className="w-4 h-4 text-red-500" />
                     </div>
                   </div>
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                </div>
-              </div>
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                      Food
-                    </span>
-                    <div>
-                      <p className="font-semibold text-gray-800">Shellfish</p>
-                      <p className="text-xs text-gray-600">Breathing difficulties</p>
-                    </div>
-                  </div>
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                </div>
-              </div>
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                      Medicine
-                    </span>
-                    <div>
-                      <p className="font-semibold text-gray-800">Naproxen</p>
-                      <p className="text-xs text-gray-600">Asthma flare</p>
-                    </div>
-                  </div>
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                </div>
-              </div>
+                ))
+              ) : (
+                <p className="text-gray-600">No allergies recorded</p>
+              )}
             </div>
           </div>
         </div>

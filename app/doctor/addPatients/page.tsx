@@ -218,7 +218,7 @@ function AddPatient() {
           <div className="mt-8 flex justify-end">
             <button
               type="submit"
-              className="btn btn-primary bg-blue-500 p-3 rounded-lg flex items-center gap-2"
+              className="btn btn-primary text-white bg-blue-500 p-3 rounded-lg flex items-center gap-2"
             >
               <Save className="w-5 h-5" />
               Save Patient
