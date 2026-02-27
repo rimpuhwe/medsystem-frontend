@@ -1,70 +1,48 @@
 "use client";
-import { FileText, Plus, Search, Send, X, CheckCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+
+import { FileText, Plus, Search, Send, X } from "lucide-react";
+import React, { useState, ChangeEvent } from "react";
 import { useToast } from "../../../hooks/useToast";
 import { ToastContainer } from "../../../../components/Toast";
-import { channel } from "diagnostics_channel";
+import { apiRequest } from "../../../../utils/api";
 
-  function PatientFoundView({ patient }: { patient: any }) {
-  const { showSuccess } = useToast();
-  const [draftPrescriptions, setDraftPrescriptions] = useState<any[]>([]);
-  
-  useEffect(() => {
-    const savedPrescriptions = localStorage.getItem('prescriptions');
-    if (savedPrescriptions) {
-      const prescriptions = JSON.parse(savedPrescriptions);
-      const drafts = prescriptions.filter((p: any) => p.patientId === patient.id && p.status === 'pending');
-      setDraftPrescriptions(drafts);
-    }
-  }, [patient.id]);
-
-  const activatePrescription = (prescriptionId: string) => {
-    const savedPrescriptions = localStorage.getItem('prescriptions');
-    if (savedPrescriptions) {
-      const prescriptions = JSON.parse(savedPrescriptions);
-      const updatedPrescriptions = prescriptions.map((p: any) => 
-        p.id === prescriptionId ? { ...p, status: 'active' } : p
-      );
-      localStorage.setItem('prescriptions', JSON.stringify(updatedPrescriptions));
-      setDraftPrescriptions(prev => prev.filter(p => p.id !== prescriptionId));
-      showSuccess('Prescription activated and sent to history!');
-    }
-  };
-
+function PatientFoundView({ patient }: { patient: any }) {
   return (
     <div className="space-y-4">
       <div className="bg-green-50 p-4 rounded-lg border border-green-200">
         <h3 className="font-medium text-green-800 mb-2">Patient Found</h3>
-        <p className="text-green-700"><strong>Name:</strong> {patient.name}</p>
-        <p className="text-green-700"><strong>ID:</strong> {patient.id}</p>
-        <p className="text-green-700"><strong>Gender:</strong> {patient.gender}</p>
-        <p className="text-green-700"><strong>Phone:</strong> {patient.phone}</p>
-      </div>
-      
-      {draftPrescriptions.length > 0 && (
-        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-          <h4 className="font-medium text-yellow-800 mb-3">Draft Prescriptions ({draftPrescriptions.length})</h4>
-          <div className="space-y-3">
-            {draftPrescriptions.map((prescription) => (
-              <div key={prescription.id} className="bg-white p-3 rounded border">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium text-sm">{prescription.id} - {prescription.diagnosis}</p>
-                    <p className="text-xs text-gray-600">{prescription.date} • {prescription.medicines?.length || 0} medicines</p>
-                  </div>
-                  <button
-                    onClick={() => activatePrescription(prescription.id)}
-                    className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 flex items-center gap-1"
-                  >
-                    <CheckCircle className="w-3 h-3" />
-                    Activate
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        <p className="text-green-700">
+          <strong>Name:</strong> {patient.name}
+        </p>
+        <p className="text-green-700">
+          <strong>ID:</strong> {patient.ReferenceNumber ?? patient.id}
+        </p>
+        {patient.gender && (
+          <p className="text-green-700">
+            <strong>Gender:</strong> {patient.gender}
+          </p>
+        )}
+        {patient.phoneNumber && (
+          <p className="text-green-700">
+            <strong>Phone:</strong> {patient.phoneNumber}
+          </p>
+        )}
+        <p className="text-green-700">
+          <strong>InsuranceProvider:</strong> {patient.insuranceProvider ?? "N/A"}
+        </p>
+        <div>
+          <strong className="text-green-700">Allergies:</strong>{" "}
+          {patient.allergies && patient.allergies.length > 0
+            ? patient.allergies.join(", ")
+            : "N/A"}
         </div>
-      )}
+        <div>
+          <strong className="text-green-700">Chronic Diseases:</strong>{" "}
+          {patient.chronicDiseases && patient.chronicDiseases.length > 0
+            ? patient.chronicDiseases.join(", ")
+            : "N/A"}
+        </div>
+      </div>
     </div>
   );
 }
@@ -81,131 +59,167 @@ interface Medicine {
 interface CreatePrescriptionProps {}
 
 function CreatePrescription({}: CreatePrescriptionProps) {
-  const { showSuccess, showError, showInfo, toasts, removeToast } = useToast();
-  const [patientId, setPatientId] = useState<string>('');
-  const [diagnosis, setDiagnosis] = useState<string>('');
+  const { showSuccess, showError, toasts, removeToast } = useToast();
+  const [patientId, setPatientId] = useState<string>("");
+  const [diagnosis, setDiagnosis] = useState<string>("");
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [foundPatient, setFoundPatient] = useState<any>(null);
-  const [currentMedicine, setCurrentMedicine] = useState<Omit<Medicine, 'id'>>({
-    name: '',
-    dosage: '',
-    frequency: '',
-    duration: '',
-    instructions: ''
+  const [currentMedicine, setCurrentMedicine] = useState<Omit<Medicine, "id">>({
+    name: "",
+    dosage: "",
+    frequency: "",
+    duration: "",
+    instructions: "",
   });
 
- const [formData, setFormData] = useState({
-      chronicDiseases: '',
-      allergies: ''
+  const [formData, setFormData] = useState({
+    chronicDiseases: "",
+    allergies: "",
   });
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
   const addMedicine = () => {
-    if (currentMedicine.name && currentMedicine.dosage && currentMedicine.frequency && currentMedicine.duration && currentMedicine.instructions) {
+    if (
+      currentMedicine.name &&
+      currentMedicine.dosage &&
+      currentMedicine.frequency &&
+      currentMedicine.duration &&
+      currentMedicine.instructions
+    ) {
       const newMedicine: Medicine = {
         ...currentMedicine,
-        id: Date.now().toString()
+        id: Date.now().toString(),
       };
-      setMedicines([...medicines, newMedicine]);
+      setMedicines((prev) => [...prev, newMedicine]);
       setCurrentMedicine({
-        name: '',
-        dosage: '',
-        frequency: '',
-        duration: '',
-        instructions: ''
+        name: "",
+        dosage: "",
+        frequency: "",
+        duration: "",
+        instructions: "",
       });
-      showSuccess('Medicine added successfully!');
+      showSuccess("Medicine added successfully!");
     }
   };
 
   const removeMedicine = (id: string) => {
-    setMedicines(medicines.filter(med => med.id !== id));
+    setMedicines((meds) => meds.filter((med) => med.id !== id));
   };
 
-  const handleMedicineChange = (field: keyof Omit<Medicine, 'id'>, value: string) => {
-    setCurrentMedicine(prev => ({ ...prev, [field]: value }));
+  const handleMedicineChange = (
+    field: keyof Omit<Medicine, "id">,
+    value: string
+  ) => {
+    setCurrentMedicine((prev) => ({ ...prev, [field]: value }));
   };
 
-  const searchPatient = () => {
+  const splitToArray = (value: string): string[] =>
+    value
+      .split(/[,;\n]/)
+      .map((v) => v.trim())
+      .filter(Boolean);
+
+  const searchPatient = async () => {
     if (!patientId.trim()) {
-      showError('Please enter a Patient ID to search.');
-      return;
-    }
-
-    const savedPatients = localStorage.getItem('patients');
-    let patients = [];
-    
-    // Default patients if none exist
-    const defaultPatients = [
-      { id: 'PAT-001', name: 'John Doe', gender: 'Male', phone: '+1 (555) 123-4567', email: 'j.doe@gmail.com', lastVisit: '1/15/2024' },
-      { id: 'PAT-002', name: 'Sarah Wilson', gender: 'Female', phone: '+1 (555) 234-5678', email: 's.wilson@gmail.com', lastVisit: '1/18/2024' },
-    ];
-
-    if (savedPatients) {
-      try {
-        patients = JSON.parse(savedPatients);
-      } catch (error) {
-        console.error('Failed to parse patients data:', error);
-        localStorage.removeItem('patients');
-        patients = defaultPatients;
-        localStorage.setItem('patients', JSON.stringify(defaultPatients));
-      }
-    } else {
-      patients = defaultPatients;
-      localStorage.setItem('patients', JSON.stringify(defaultPatients));
-    }
-    
-    const patient = patients.find((p: any) => p.id.toLowerCase() === patientId.toLowerCase());
-    if (patient) {
-      setFoundPatient(patient);
-      showSuccess(`Patient ${patient.name} found!`);
-    } else {
-      setFoundPatient(null);
-      showError(`Patient with ID "${patientId}" not found. Try PAT-001 or PAT-002.`);
-    }
-  };
-
-  const savePrescription = (isDraft: boolean = false) => {
-    if (!foundPatient || !diagnosis.trim() || medicines.length === 0) {
-      showError('Please search for a valid patient, add diagnosis, and at least one medicine.');
+      showError("Please enter a Patient reference number to search.");
       return;
     }
 
     try {
-      const prescriptionId = `PRX-${Date.now().toString().slice(-6)}`;
-      const prescriptionData = {
-        id: prescriptionId,
-        patientId: foundPatient.id,
-        patientName: foundPatient.name,
-        date: new Date().toLocaleDateString(),
-            diagnosis,
-        notes: '',
-        medicines,
-        status: isDraft ? 'pending' : 'active'
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("token") || ""
+          : "";
+
+      const response = await apiRequest(
+        `https://medsystemapplication.onrender.com/api/patient?patientReferenceNumber=${encodeURIComponent(
+          patientId.trim()
+        )}`,
+        token
+      );
+
+      const patient = await response.json();
+      setFoundPatient(patient);
+      showSuccess(`Patient ${patient.fullName ?? patient.name ?? ""} found!`);
+    } catch (error: any) {
+      console.error("Failed to fetch patient:", error);
+      setFoundPatient(null);
+      const message =
+        error instanceof Error
+          ? error.message
+          : `Patient with reference number "${patientId}" not found.`;
+      showError(message);
+    }
+  };
+
+  const savePrescription = async (isDraft: boolean) => {
+    if (!foundPatient || !diagnosis.trim() || medicines.length === 0) {
+      showError(
+        "Please search for a valid patient, add diagnosis, and at least one medicine."
+      );
+      return;
+    }
+
+    try {
+      const payload = {
+        diagnosis,
+        medicines: medicines.map((m) => {
+          const base = `${m.name} - ${m.dosage}`;
+          const details = [m.frequency, m.duration]
+            .filter(Boolean)
+            .join(", ");
+          const withDetails = details ? `${base}, ${details}` : base;
+          return m.instructions
+            ? `${withDetails} (${m.instructions})`
+            : withDetails;
+        }),
+        chronicDiseases: splitToArray(formData.chronicDiseases),
+        allergies: splitToArray(formData.allergies),
       };
-      
-      const savedData = localStorage.getItem('prescriptions');
-      let existingPrescriptions = [];
-      
-      if (savedData) {
-        try {
-          existingPrescriptions = JSON.parse(savedData);
-        } catch (parseError) {
-          console.error('Failed to parse prescriptions, starting fresh:', parseError);
-          localStorage.removeItem('prescriptions');
+
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("token") || ""
+          : "";
+
+      const response = await apiRequest(
+        `https://medsystemapplication.onrender.com/api/doctors/consultation?patientReferenceNumber=${encodeURIComponent(
+          patientId.trim()
+        )}`,
+        token,
+        {
+          method: "POST",
+          body: JSON.stringify(payload),
         }
-      }
-      
-      existingPrescriptions.push(prescriptionData);
-      localStorage.setItem('prescriptions', JSON.stringify(existingPrescriptions));
-      
-      showSuccess(`Prescription ${isDraft ? 'saved as draft' : 'created and sent'} with ID: ${prescriptionId}`);
-      setPatientId(''); setDiagnosis(''); setMedicines([]); setFoundPatient(null);
+      );
+
+      const data = await response.json();
+
+      showSuccess(
+        `Consultation ${
+          isDraft ? "saved as draft" : "created and sent"
+        } successfully${
+          (data as any)?.id ? ` with ID: ${(data as any).id}` : ""
+        }.`
+      );
+      setPatientId("");
+      setDiagnosis("");
+      setMedicines([]);
+      setFoundPatient(null);
+      setFormData({ chronicDiseases: "", allergies: "" });
     } catch (error) {
-      console.error('Failed to save prescription:', error);
-      showError('Failed to save prescription. Please try again.');
+      console.error("Failed to save consultation:", error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to save consultation. Please try again.";
+      showError(message);
     }
   };
 
@@ -213,21 +227,29 @@ function CreatePrescription({}: CreatePrescriptionProps) {
     <>
       <div className="space-y-6">
         <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Create New Prescription</h1>
-        <p className="text-gray-600">Create and send prescriptions to patients</p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+            Create New Prescription
+          </h1>
+          <p className="text-gray-600">
+            Create and send prescriptions to patients
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Patient Information</h2>
-          <p className="text-gray-600 text-sm mb-6">Search for patient by ID</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Patient Information
+            </h2>
+            <p className="text-gray-600 text-sm mb-6">
+              Search for patient by ID
+            </p>
 
             <div className="flex gap-2">
               <input
                 type="text"
                 value={patientId}
                 onChange={(e) => setPatientId(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && searchPatient()}
+                onKeyDown={(e) => e.key === "Enter" && searchPatient()}
                 placeholder="Enter Patient ID (e.g., PAT-001)"
                 className="flex-1 px-4 py-3 text-gray-900 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
@@ -241,13 +263,15 @@ function CreatePrescription({}: CreatePrescriptionProps) {
             </div>
           </div>
 
-        {foundPatient && (
-          <PatientFoundView patient={foundPatient} />
-        )}
+          {foundPatient && <PatientFoundView patient={foundPatient} />}
 
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Diagnosis & Notes</h2>
-          <p className="text-gray-600 text-sm mb-6">Enter diagnosis and additional notes</p>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Diagnosis & Notes
+            </h2>
+            <p className="text-gray-600 text-sm mb-6">
+              Enter diagnosis and additional notes
+            </p>
             <textarea
               value={diagnosis}
               onChange={(e) => setDiagnosis(e.target.value)}
@@ -257,16 +281,18 @@ function CreatePrescription({}: CreatePrescriptionProps) {
             />
           </div>
         </div>
-        {/* Medical Information Section */}
+
         <div>
           <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900">
             Medical Information
             <Plus className="w-5 h-5 text-blue-600" />
           </h3>
-            
+
           <div className="bg-gray-50 p-6 rounded-lg space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Chronic Diseases</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Chronic Diseases
+              </label>
               <textarea
                 name="chronicDiseases"
                 value={formData.chronicDiseases}
@@ -274,10 +300,12 @@ function CreatePrescription({}: CreatePrescriptionProps) {
                 placeholder="List any chronic diseases or conditions"
                 className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                 rows={3}
-               />
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Allergies</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Allergies
+              </label>
               <textarea
                 name="allergies"
                 value={formData.allergies}
@@ -289,23 +317,35 @@ function CreatePrescription({}: CreatePrescriptionProps) {
             </div>
           </div>
         </div>
-        {/* Medicines Section */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Prescription Medicines</h2>
-        <p className="text-gray-600 text-sm mb-6">Add medicines to the prescription with dosage and instructions</p>
 
-          {/* Added Medicines List */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Prescription Medicines
+          </h2>
+          <p className="text-gray-600 text-sm mb-6">
+            Add medicines to the prescription with dosage and instructions
+          </p>
+
           {medicines.length > 0 && (
             <div className="mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Added Medicines ({medicines.length})</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Added Medicines ({medicines.length})
+              </h3>
               <div className="space-y-3">
                 {medicines.map((medicine) => (
-                <div key={medicine.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div
+                    key={medicine.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex-1">
-                    <div className="font-medium text-gray-900">{medicine.name}</div>
+                      <div className="font-medium text-gray-900">
+                        {medicine.name}
+                      </div>
                       <div className="text-sm text-gray-600">
-                      {medicine.dosage} • {medicine.frequency} • {medicine.duration}
-                        {medicine.instructions && ` • ${medicine.instructions}`}
+                        {medicine.dosage} • {medicine.frequency} •{" "}
+                        {medicine.duration}
+                        {medicine.instructions &&
+                          ` • ${medicine.instructions}`}
                       </div>
                     </div>
                     <button
@@ -320,7 +360,6 @@ function CreatePrescription({}: CreatePrescriptionProps) {
             </div>
           )}
 
-          {/* Add Medicine Form */}
           <div className="bg-gray-50 p-6 rounded-lg">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900">
               Add Medicine
@@ -330,22 +369,30 @@ function CreatePrescription({}: CreatePrescriptionProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Medicine Name
+                  </label>
                   <input
                     type="text"
                     value={currentMedicine.name}
-                  onChange={(e) => handleMedicineChange('name', e.target.value)}
+                    onChange={(e) =>
+                      handleMedicineChange("name", e.target.value)
+                    }
                     placeholder="e.g., Amoxicillin"
                     required
                     className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Dosage</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Dosage
+                  </label>
                   <input
                     type="text"
                     value={currentMedicine.dosage}
-                  onChange={(e) => handleMedicineChange('dosage', e.target.value)}
+                    onChange={(e) =>
+                      handleMedicineChange("dosage", e.target.value)
+                    }
                     placeholder="e.g., 500mg"
                     required
                     className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -355,25 +402,35 @@ function CreatePrescription({}: CreatePrescriptionProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Frequency
+                  </label>
                   <select
                     value={currentMedicine.frequency}
-                  onChange={(e) => handleMedicineChange('frequency', e.target.value)}
+                    onChange={(e) =>
+                      handleMedicineChange("frequency", e.target.value)
+                    }
                     required
                     className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="">Select frequency</option>
                     <option value="once-daily">Once Daily</option>
                     <option value="twice-daily">Twice Daily</option>
-                    <option value="three-times-daily">Three Times Daily</option>
+                    <option value="three-times-daily">
+                      Three Times Daily
+                    </option>
                     <option value="as-needed">As Needed</option>
                   </select>
                 </div>
                 <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration
+                  </label>
                   <select
                     value={currentMedicine.duration}
-                  onChange={(e) => handleMedicineChange('duration', e.target.value)}
+                    onChange={(e) =>
+                      handleMedicineChange("duration", e.target.value)
+                    }
                     required
                     className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
@@ -388,11 +445,15 @@ function CreatePrescription({}: CreatePrescriptionProps) {
               </div>
 
               <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Special Instructions</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Special Instructions
+                </label>
                 <input
                   type="text"
                   value={currentMedicine.instructions}
-                onChange={(e) => handleMedicineChange('instructions', e.target.value)}
+                  onChange={(e) =>
+                    handleMedicineChange("instructions", e.target.value)
+                  }
                   placeholder="e.g., take with food"
                   required
                   className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
