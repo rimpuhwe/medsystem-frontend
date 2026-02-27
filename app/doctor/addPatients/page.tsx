@@ -57,15 +57,15 @@ function AddPatient() {
         <p className="text-gray-600">Register a new patient in the system</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-4xl">
-        <div className="card">
-          <div className="mb-6">
+      <form onSubmit={handleSubmit} className="max-w-4xl ">
+        <div className="card ">
+          <div className="mb-6 ">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Patient Information</h2>
             <p className="text-sm text-gray-600">Enter the patient's personal and medical information</p>
           </div>
 
           {/* Personal Information Section */}
-          <div className="mb-8">
+          <div className="mb-8 shadow-2xl rounded-lg border border-gray-200 p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900">
               Personal Information
               <Plus className="w-5 h-5 text-blue-600" />
@@ -156,7 +156,7 @@ function AddPatient() {
           </div>
 
           {/* insurance details Section */}
-          <div>
+          <div className="shadow-2xl rounded-lg border border-gray-200 p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900">
               Insurance Details
               <Plus className="w-5 h-5 text-blue-600" />
@@ -218,7 +218,7 @@ function AddPatient() {
           <div className="mt-8 flex justify-end">
             <button
               type="submit"
-              className="btn btn-primary flex items-center gap-2"
+              className="btn btn-primary bg-blue-500 p-3 rounded-lg flex items-center gap-2"
             >
               <Save className="w-5 h-5" />
               Save Patient

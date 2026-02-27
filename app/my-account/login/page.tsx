@@ -66,6 +66,7 @@ const LoginPage: React.FC = () => {
             const profileData = await profileResponse.json();
             const profileKey = Role === "DOCTOR" ? "doctorProfile" : "pharmacistProfile";
             localStorage.setItem(profileKey, JSON.stringify(profileData));
+            window.dispatchEvent(new Event('profileUpdated'));
           }
         } catch (profileError) {
           console.error("Failed to fetch profile:", profileError);
